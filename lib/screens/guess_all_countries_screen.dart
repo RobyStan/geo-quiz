@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../data/countries_test.dart'; 
+//import '../data/countries_test.dart'; 
+import '../data/countries.dart'; 
 import 'home_screen.dart';
 import '../widgets/world_map_widgets.dart';
 import '../models/game_type.dart';
@@ -35,6 +36,8 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
   String message = '';
   Color messageColor = Colors.red;
 
+  String? currentHint; 
+
   @override
   void initState() {
     super.initState();
@@ -65,37 +68,61 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
     guessedCountries.clear();
     gameOver = false;
     message = '';
+    messageColor = Colors.red;
+    currentHint = null;
     _controller.clear();
+  }
+
+  void _showHint() {
+    if (currentHint != null) {
+      return;
+    }
+    final notGuessed = allCountries
+        .map((c) => c['name']!)
+        .where((name) => !guessedCountries.contains(name))
+        .toList();
+
+    if (notGuessed.isNotEmpty) {
+      setState(() {
+        currentHint = notGuessed.first; 
+        message = 'Hint: $currentHint';
+        messageColor = Colors.green;
+      });
+    }
   }
 
   void _checkAnswer(String input) {
     if (gameOver) return;
 
     final answer = input.trim().toLowerCase();
-    final found = allCountries.any(
-      (country) =>
-          country['name']!.toLowerCase() == answer &&
-          !guessedCountries.contains(country['name']),
+
+    final foundCountry = allCountries.firstWhere(
+      (country) => country['name']!.toLowerCase() == answer,
+      orElse: () => {},
     );
 
-    if (found) {
-      setState(() {
-        guessedCountries.add(
-          allCountries.firstWhere(
-            (c) => c['name']!.toLowerCase() == answer,
-          )['name']!,
-        );
-        message = 'Correct! 🎉';
-        messageColor = Colors.green;
-        _controller.clear();
+    if (foundCountry.isEmpty) return;
 
-        if (guessedCountries.length == allCountries.length) {
-          gameOver = true;
-          message = 'You guessed all countries! 🎉';
-          countdownTimer?.cancel();
-        }
-      });
-    }
+    final countryName = foundCountry['name']!;
+
+    if (guessedCountries.contains(countryName)) return;
+
+    setState(() {
+      guessedCountries.add(countryName);
+      _controller.clear();
+
+      if (currentHint == countryName) {
+        currentHint = null;
+        message = '';
+      }
+
+      if (guessedCountries.length == allCountries.length) {
+        gameOver = true;
+        message = 'You guessed all countries! 🎉';
+        messageColor = Colors.green;
+        countdownTimer?.cancel();
+      }
+    });
   }
 
   void _restartGame() {
@@ -108,6 +135,7 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
       gameOver = false;
       message = '';
       messageColor = Colors.red;
+      currentHint = null;
 
       if (!widget.isPractice) {
         countdownTimer?.cancel();
@@ -128,7 +156,7 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
         });
       }
     });
- }
+  }
 
   String _formatTime(int totalSeconds) {
     final minutes = totalSeconds ~/ 60;
@@ -183,15 +211,25 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
                 style: TextStyle(fontSize: 18, color: messageColor),
               ),
             const SizedBox(height: 20),
-
-            // Harta pe tot ecranul rămas
-            Expanded(
-              child: WorldMapScreen(
-                region: widget.region,
-                guessedCountries: guessedCountries,
+              Expanded(
+                child: Stack(
+                  children: [
+                    WorldMapScreen(
+                      region: widget.region,
+                      guessedCountries: guessedCountries,
+                    ),
+                    if (widget.isPractice)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: ElevatedButton(
+                          onPressed: _showHint,
+                          child: const Text('Hint'),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-
             if (gameOver) ...[
               const SizedBox(height: 20),
               ElevatedButton(
