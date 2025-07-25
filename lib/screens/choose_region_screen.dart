@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'guess_flag_screen.dart';
+import 'choose_game_mode_screen.dart';
 
 class ChooseRegionScreen extends StatelessWidget {
   const ChooseRegionScreen({super.key});
 
-  // Mutăm lista într-o metodă pentru a evita eroarea de compilare
   List<String> get regions => const [
         'World',
         'Europe',
@@ -31,7 +30,7 @@ class ChooseRegionScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => GuessFlagScreen(region: region),
+                      builder: (_) => ChooseGameModeScreen(region: region),
                     ),
                   );
                 },
