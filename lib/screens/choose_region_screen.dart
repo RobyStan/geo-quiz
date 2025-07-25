@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'choose_game_mode_screen.dart';
+import 'package:geo_quiz_app/models/game_type.dart';
 
 class ChooseRegionScreen extends StatelessWidget {
-  const ChooseRegionScreen({super.key});
+    final GameType gameType;
+
+  const ChooseRegionScreen({super.key, required this.gameType});
 
   List<String> get regions => const [
         'World',
@@ -30,7 +33,7 @@ class ChooseRegionScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ChooseGameModeScreen(region: region),
+                      builder: (_) => ChooseGameModeScreen(region: region,  gameType: gameType,),
                     ),
                   );
                 },

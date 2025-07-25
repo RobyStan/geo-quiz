@@ -181,7 +181,7 @@ final List<Map<String, String>> countries =  [
     {'name': 'Saint Vincent and the Grenadines', 'code': 'vc', 'region': 'America'},
     {'name': 'Suriname', 'code': 'sr', 'region': 'America'},
     {'name': 'Trinidad and Tobago', 'code': 'tt', 'region': 'America'},
-    {'name': 'United States', 'code': 'us', 'region': 'America'},
+    {'name': 'United States of America', 'code': 'us', 'region': 'America'},
     {'name': 'Uruguay', 'code': 'uy', 'region': 'America'},
     {'name': 'Venezuela', 'code': 've', 'region': 'America'},
     {'name': 'Australia', 'code': 'au', 'region': 'Oceania'},

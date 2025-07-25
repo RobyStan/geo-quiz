@@ -1,6 +1,6 @@
 final List<Map<String, String>> countries = [
   {'name': 'Romania', 'code': 'ro', 'region': 'Europe'},
-  {'name': 'United States', 'code': 'us', 'region': 'America'},
+  {'name': 'United States of America', 'code': 'us', 'region': 'America'},
   {'name': 'France', 'code': 'fr', 'region': 'Europe'},
   {'name': 'Germany', 'code': 'de', 'region': 'Europe'},
   {'name': 'Japan', 'code': 'jp', 'region': 'Asia'},

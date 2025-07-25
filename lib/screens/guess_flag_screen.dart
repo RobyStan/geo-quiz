@@ -3,17 +3,21 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geo_quiz_app/screens/home_screen.dart';
 import '../data/countries_test.dart';
+import '../models/game_type.dart';
+import 'choose_region_screen.dart';
 
 class GuessFlagScreen extends StatefulWidget {
   final String region;
   final bool isPractice;
   final int timeLimitMinutes;
+  final GameType gameType;
 
   const GuessFlagScreen({
     super.key,
     required this.region,
     required this.isPractice,
     required this.timeLimitMinutes,
+    required this.gameType,
   });
 
   @override
@@ -30,7 +34,7 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
 
   Timer? countdownTimer;
   late int secondsLeft;
-  late  int totalCountries;
+  late int totalCountries;
   int correctCount = 0;
 
   bool gameOver = false;
@@ -72,7 +76,8 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
       if (widget.region == 'World') {
         remainingCountries = List.from(countries);
       } else {
-        remainingCountries = countries.where((c) => c['region'] == widget.region).toList();
+        remainingCountries =
+            countries.where((c) => c['region'] == widget.region).toList();
       }
       skippedCountries.clear();
       correctCount = 0;
@@ -86,18 +91,18 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
     setState(() {
       if (remainingCountries.isEmpty) {
         if (skippedCountries.isEmpty) {
-         _endGame();
-         return;
-       } else {
+          _endGame();
+          return;
+        } else {
           remainingCountries = List.from(skippedCountries);
-         skippedCountries.clear();
-       }
-     }
-     final random = Random();
-     final index = random.nextInt(remainingCountries.length);
-     currentCountry = remainingCountries[index];
-     _controller.clear();
-     message = '';
+          skippedCountries.clear();
+        }
+      }
+      final random = Random();
+      final index = random.nextInt(remainingCountries.length);
+      currentCountry = remainingCountries[index];
+      _controller.clear();
+      message = '';
     });
   }
 
@@ -113,11 +118,12 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
   }
 
   void _removeCurrentCountry() {
-    remainingCountries.removeWhere((country) => country['name'] == currentCountry['name']);
+    remainingCountries
+        .removeWhere((country) => country['name'] == currentCountry['name']);
   }
 
   void _checkAnswer(String answer) {
-    if (gameOver) return; 
+    if (gameOver) return;
     final cleanedAnswer = answer.trim().toLowerCase();
     final correct = currentCountry['name']!.toLowerCase();
     if (cleanedAnswer == correct) {
@@ -139,7 +145,8 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
     if (gameOver) return;
     setState(() {
       skippedCountries.add(currentCountry);
-      remainingCountries.removeWhere((country) => country['name'] == currentCountry['name']);
+      remainingCountries
+          .removeWhere((country) => country['name'] == currentCountry['name']);
       _pickRandomCountry();
     });
   }
@@ -269,10 +276,23 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
         ElevatedButton(
           onPressed: () {
             Navigator.pushAndRemoveUntil(
-              context, 
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
+              ),
+              (route) => false,
+            );
+          },
+          child: const Text('Change Region'),
+        ),
+        const SizedBox(height: 12),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
               MaterialPageRoute(builder: (_) => const HomeScreen()),
               (route) => false,
-            ); 
+            );
           },
           child: const Text('Main Menu'),
         ),

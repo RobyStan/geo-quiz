@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geo_quiz_app/screens/choose_region_screen.dart';
+import 'package:geo_quiz_app/models/game_type.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -21,13 +22,18 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ChooseRegionScreen()),
+                  MaterialPageRoute( builder: (_) => ChooseRegionScreen(gameType: GameType.guessFlag)),
                 );
               },
               child: const Text('Guess the Flag 🌍'),
             ),
             ElevatedButton(
-              onPressed: () {}, 
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute( builder: (_) => ChooseRegionScreen(gameType: GameType.guessAllCountries)),
+                );
+              },
               child: const Text('Guess all Countries 🌍'),
             ),
             ElevatedButton(
