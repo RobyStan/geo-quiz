@@ -37,7 +37,7 @@ Geo Quiz is an interactive Flutter app where users can guess countries, flags, o
 ---
 ## Language support
 
-The game will be developed to support both **English and Romanian** languages, allowing users to switch between languages easily.
+- [ ] The game will be developed to support both **English and Romanian** languages, allowing users to switch between languages easily.
 
 ## Resources
 - GeoJSON map data provided by [geojson-maps.kyd.au](https://geojson-maps.kyd.au/?utm_source=self&utm_medium=redirect)
