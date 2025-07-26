@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_quiz_app/models/game_type.dart';
 import 'guess_flag_screen.dart';
 import 'guess_all_countries_screen.dart';  
+import 'find_the_country_screen.dart';
 
 class ChooseGameModeScreen extends StatelessWidget {
   final String region;
@@ -41,8 +42,6 @@ class ChooseGameModeScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 40),
-
-              // Afișează butoanele conform tipului jocului
               if (gameType == GameType.guessFlag) ...[
                 ElevatedButton(
                   onPressed: () {
@@ -101,6 +100,39 @@ class ChooseGameModeScreen extends StatelessWidget {
                           region: region,
                           isPractice: false,
                           timeLimitMinutes: timeLimit, gameType: GameType.guessAllCountries,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Timed Mode'),
+                ),
+              ] else if (gameType == GameType.findTheCountry) ...[
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FindTheCountryScreen(
+                          region: region,
+                          isPractice: true,
+                          timeLimitMinutes: timeLimit, gameType: GameType.findTheCountry,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Practice Mode'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FindTheCountryScreen(
+                          region: region,
+                          isPractice: false,
+                          timeLimitMinutes: timeLimit,
+                          gameType: GameType.findTheCountry,
                         ),
                       ),
                     );

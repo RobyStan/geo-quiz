@@ -7,7 +7,7 @@ import 'package:latlong2/latlong.dart';
 class WorldMapScreen extends StatefulWidget {
   final String region;
   final Set<String> guessedCountries;
-
+  
   const WorldMapScreen({
     super.key,
     required this.region,
