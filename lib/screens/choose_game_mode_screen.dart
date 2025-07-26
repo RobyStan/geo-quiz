@@ -4,6 +4,7 @@ import 'guess_flag_screen.dart';
 import 'guess_all_countries_screen.dart';  
 import 'find_the_country_screen.dart';
 import 'guess_the_capital.dart';
+import 'find_the_capital_screen.dart';
 
 class ChooseGameModeScreen extends StatelessWidget {
   final String region;
@@ -165,6 +166,38 @@ class ChooseGameModeScreen extends StatelessWidget {
                           region: region,
                           isPractice: false,
                           timeLimitMinutes: timeLimit, gameType: GameType.guessTheCapital,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Timed Mode'),
+                ),
+              ] else if (gameType == GameType.findTheCapital) ...[
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FindTheCapitalScreen(
+                          region: region,
+                          isPractice: true,
+                          timeLimitMinutes: timeLimit, gameType: GameType.findTheCapital,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Practice Mode'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FindTheCapitalScreen(
+                          region: region,
+                          isPractice: false,
+                          timeLimitMinutes: timeLimit, gameType: GameType.findTheCapital,
                         ),
                       ),
                     );

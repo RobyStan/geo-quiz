@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:geo_quiz_app/screens/choose_region_screen.dart';
 import 'package:geo_quiz_app/models/game_type.dart';
@@ -57,7 +58,14 @@ class HomeScreen extends StatelessWidget {
               child: const Text('Find the Country 🌍'),
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChooseRegionScreen(gameType: GameType.findTheCapital),
+                  ),
+                );
+              },
               child: const Text('Find the Capital 🌍'),
             ),
           ],

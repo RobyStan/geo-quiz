@@ -3,4 +3,5 @@ enum GameType {
   guessAllCountries,
   guessTheCapital,
   findTheCountry,
+  findTheCapital,
 }
