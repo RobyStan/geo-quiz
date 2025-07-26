@@ -3,6 +3,7 @@ import 'package:geo_quiz_app/models/game_type.dart';
 import 'guess_flag_screen.dart';
 import 'guess_all_countries_screen.dart';  
 import 'find_the_country_screen.dart';
+import 'guess_the_capital.dart';
 
 class ChooseGameModeScreen extends StatelessWidget {
   final String region;
@@ -131,15 +132,46 @@ class ChooseGameModeScreen extends StatelessWidget {
                         builder: (_) => FindTheCountryScreen(
                           region: region,
                           isPractice: false,
-                          timeLimitMinutes: timeLimit,
-                          gameType: GameType.findTheCountry,
+                          timeLimitMinutes: timeLimit, gameType: GameType.findTheCountry,
                         ),
                       ),
                     );
                   },
                   child: const Text('Timed Mode'),
                 ),
-              ],
+              ] else if (gameType == GameType.guessTheCapital) ...[
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GuessCapitalScreen(
+                          region: region,
+                          isPractice: true,
+                          timeLimitMinutes: timeLimit, gameType: GameType.guessTheCapital,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Practice Mode'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GuessCapitalScreen(
+                          region: region,
+                          isPractice: false,
+                          timeLimitMinutes: timeLimit, gameType: GameType.guessTheCapital,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Timed Mode'),
+                ),
+              ]
             ],
           ),
         ),

@@ -36,8 +36,13 @@ class HomeScreen extends StatelessWidget {
               },
               child: const Text('Guess all Countries 🌍'),
             ),
-            ElevatedButton(
-              onPressed: () {},
+             ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute( builder: (_) => ChooseRegionScreen(gameType: GameType.guessTheCapital)),
+                );
+              },
               child: const Text('Guess the Capital 🌍'),
             ),
             ElevatedButton(
