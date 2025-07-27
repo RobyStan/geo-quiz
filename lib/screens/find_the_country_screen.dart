@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../widgets/world_map_find_country.dart';
 import 'home_screen.dart';
-import 'choose_region_screen.dart'; 
+import 'choose_region_screen.dart';
 import '../models/game_type.dart';
 import '../data/countries_test.dart';
 
@@ -33,13 +33,15 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
 
   bool gameOver = false;
 
-  int _wrongAttempts = 0; 
+  int _wrongAttempts = 0;
 
   Key _worldMapKey = UniqueKey();
 
   Map<String, String>? currentTarget;
 
-  final Set<String> _correctCountryCodes = {}; 
+  final Set<String> _correctCountryCodes = {};
+
+  String? _hintedCountryCode; 
 
   @override
   void initState() {
@@ -49,15 +51,18 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
 
   void _initGame() {
     filteredCountries = (widget.region.toLowerCase() == 'world')
-      ? List.from(countries)
-      : countries.where((country) =>
-          country['region']?.toLowerCase() == widget.region.toLowerCase()
-        ).toList();
+        ? List.from(countries)
+        : countries
+            .where((country) =>
+                country['region']?.toLowerCase() ==
+                widget.region.toLowerCase())
+            .toList();
 
     gameOver = false;
     _wrongAttempts = 0;
-    _correctCountryCodes.clear();   
+    _correctCountryCodes.clear();
     _worldMapKey = UniqueKey();
+    _hintedCountryCode = null;
 
     _pickNewCountry();
 
@@ -74,7 +79,9 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
       _onGameFinished();
       return;
     }
-    currentTarget = filteredCountries[Random().nextInt(filteredCountries.length)];
+    currentTarget =
+        filteredCountries[Random().nextInt(filteredCountries.length)];
+    _hintedCountryCode = null; 
   }
 
   void _startTimer() {
@@ -148,7 +155,8 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     if (targetCodeLower != null && tappedLower == targetCodeLower) {
       setState(() {
         _correctCountryCodes.add(tappedLower);
-        filteredCountries.removeWhere((c) => c['code']?.toLowerCase() == tappedLower);
+        filteredCountries
+            .removeWhere((c) => c['code']?.toLowerCase() == tappedLower);
         if (filteredCountries.isEmpty) {
           _onGameFinished();
         } else {
@@ -158,6 +166,14 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     } else {
       _handleWrongAttempt();
     }
+  }
+
+  void _showHint() {
+    if (_hintedCountryCode != null || currentTarget == null) return;
+
+    setState(() {
+      _hintedCountryCode = currentTarget!['code'];
+    });
   }
 
   String _formatTime(int seconds) {
@@ -195,29 +211,41 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
       body: Column(
         children: [
           _buildErrorCounter(),
-
           if (!gameOver && currentTarget != null)
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Text(
                 'Where is: ${currentTarget!['name']}?',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),
-
           Expanded(
-            child: WorldMapFindCountry(
-              key: _worldMapKey,
-              region: widget.region,
-              isPractice: widget.isPractice,
-              countries: filteredCountries,
-              onGameOver: _handleGameOver,
-              onWrongAttempt: _handleWrongAttempt,
-              onCountryTap: _handleCorrectCountryTap,
-              correctCountryCodes: _correctCountryCodes, 
+            child: Stack(
+              children: [
+                WorldMapFindCountry(
+                  key: _worldMapKey,
+                  region: widget.region,
+                  isPractice: widget.isPractice,
+                  countries: filteredCountries,
+                  onGameOver: _handleGameOver,
+                  onWrongAttempt: _handleWrongAttempt,
+                  onCountryTap: _handleCorrectCountryTap,
+                  correctCountryCodes: _correctCountryCodes,
+                  hintedCountryCode: _hintedCountryCode, 
+                ),
+                if (widget.isPractice)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: ElevatedButton(
+                      onPressed: _showHint,
+                      child: const Text('Hint'),
+                    ),
+                  ),
+              ],
             ),
           ),
-
           if (gameOver) ...[
             const SizedBox(height: 20),
             ElevatedButton(
@@ -230,7 +258,8 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
+                    builder: (_) =>
+                        ChooseRegionScreen(gameType: widget.gameType),
                   ),
                   (route) => false,
                 );
