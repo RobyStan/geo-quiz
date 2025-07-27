@@ -12,7 +12,8 @@ class WorldMapFindCapital extends StatefulWidget {
   final VoidCallback? onWrongAttempt;
   final void Function(String countryCode)? onCapitalTap;
   final Set<String> correctCountryCodes;
-
+  final String? hintedCountryCode; 
+  
   const WorldMapFindCapital({
     super.key,
     required this.region,
@@ -22,22 +23,61 @@ class WorldMapFindCapital extends StatefulWidget {
     this.onWrongAttempt,
     this.onCapitalTap,
     this.correctCountryCodes = const {},
+    this.hintedCountryCode,
   });
 
   @override
   State<WorldMapFindCapital> createState() => _WorldMapFindCapitalState();
 }
 
-class _WorldMapFindCapitalState extends State<WorldMapFindCapital> {
+class _WorldMapFindCapitalState extends State<WorldMapFindCapital>
+    with SingleTickerProviderStateMixin {
   final List<CountryPolygon> _allCountryPolygons = [];
   final List<CountryPolygon> _filteredCountryPolygons = [];
 
   late Map<String, String> countryNameToCode;
 
+  late AnimationController _animationController;
+  late Animation<int> _pulseAnimation;
+
+  final MapController _mapController = MapController();
+
   @override
   void initState() {
     super.initState();
     _loadGeoJson();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+
+    _pulseAnimation = IntTween(begin: 80, end: 200).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    if (widget.hintedCountryCode != null) {
+      _animationController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant WorldMapFindCapital oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.hintedCountryCode != oldWidget.hintedCountryCode) {
+      if (widget.hintedCountryCode != null) {
+        centerOnCountry(widget.hintedCountryCode!);
+        _animationController.repeat(reverse: true);
+      } else {
+        _animationController.stop();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadGeoJson() async {
@@ -107,6 +147,11 @@ class _WorldMapFindCapitalState extends State<WorldMapFindCapital> {
     final tappedCode = countryNameToCode[tappedCountryName];
     if (tappedCode == null) return;
 
+    if (widget.hintedCountryCode != null &&
+        tappedCode == widget.hintedCountryCode!.toLowerCase()) {
+      _animationController.stop();
+    }
+
     if (widget.onCapitalTap != null) {
       widget.onCapitalTap!(tappedCode);
     }
@@ -148,6 +193,51 @@ class _WorldMapFindCapitalState extends State<WorldMapFindCapital> {
     return oddNodes;
   }
 
+  void centerOnCountry(String countryCode) {
+    final polygon = _filteredCountryPolygons.firstWhere(
+      (cp) {
+        final code = widget.countries.firstWhere(
+          (c) => c['name'] == cp.countryName,
+          orElse: () => {},
+        )['code'];
+        return code != null && code.toLowerCase() == countryCode.toLowerCase();
+      },
+      orElse: () => CountryPolygon(countryName: '', rings: []),
+    );
+
+    if (polygon.rings.isEmpty) return;
+
+    double minLat = double.infinity, maxLat = -double.infinity;
+    double minLng = double.infinity, maxLng = -double.infinity;
+
+    for (final ring in polygon.rings) {
+      for (final point in ring) {
+        if (point.latitude < minLat) minLat = point.latitude;
+        if (point.latitude > maxLat) maxLat = point.latitude;
+        if (point.longitude < minLng) minLng = point.longitude;
+        if (point.longitude > maxLng) maxLng = point.longitude;
+      }
+    }
+
+    final centerLat = (minLat + maxLat) / 2;
+    final centerLng = (minLng + maxLng) / 2;
+
+    final latDiff = maxLat - minLat;
+    final lngDiff = maxLng - minLng;
+    double zoom = 5.0;
+    if (latDiff > 20 || lngDiff > 20) {
+      zoom = 3.0;
+    } else if (latDiff > 10 || lngDiff > 10) {
+      zoom = 4.0;
+    } else if (latDiff > 5 || lngDiff > 5) {
+      zoom = 5.0;
+    } else {
+      zoom = 6.0;
+    }
+
+    _mapController.move(LatLng(centerLat, centerLng), zoom);
+  }
+
   @override
   Widget build(BuildContext context) {
     final center = _getRegionCenter(widget.region);
@@ -155,6 +245,7 @@ class _WorldMapFindCapitalState extends State<WorldMapFindCapital> {
 
     return Scaffold(
       body: FlutterMap(
+        mapController: _mapController,
         options: MapOptions(
           center: center,
           zoom: zoom,
@@ -171,34 +262,48 @@ class _WorldMapFindCapitalState extends State<WorldMapFindCapital> {
             subdomains: const ['a', 'b', 'c'],
             userAgentPackageName: 'com.example.geoquiz',
           ),
-          PolygonLayer(
-            polygons: _filteredCountryPolygons.expand((cp) {
-              final countryCode = countryNameToCode[cp.countryName];
-              final isCorrect =
-                  countryCode != null && widget.correctCountryCodes.contains(countryCode);
-              return cp.rings.map((ring) {
-                return Polygon(
-                  points: ring,
-                  color: isCorrect
-                      ? Colors.green.withAlpha(150)
-                      : Colors.grey.withAlpha(25),
-                  borderColor:
-                      isCorrect ? Colors.green : Colors.black.withAlpha(50),
-                  borderStrokeWidth: isCorrect ? 2 : 0.5,
-                  isFilled: true,
-                  label: cp.countryName,
-                  labelStyle: widget.isPractice
-                      ? const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        )
-                      : const TextStyle(
-                          color: Colors.transparent,
-                        ),
-                );
-              });
-            }).toList(),
+          AnimatedBuilder(
+            animation: _pulseAnimation,
+            builder: (context, child) {
+              return PolygonLayer(
+                polygons: _filteredCountryPolygons.expand((cp) {
+                  final countryCode = countryNameToCode[cp.countryName];
+                  final isCorrect =
+                      countryCode != null && widget.correctCountryCodes.contains(countryCode);
+                  final isHinted =
+                      widget.hintedCountryCode != null &&
+                      countryCode == widget.hintedCountryCode!.toLowerCase();
+
+                  return cp.rings.map((ring) {
+                    return Polygon(
+                      points: ring,
+                      color: isCorrect
+                          ? Colors.green.withAlpha(150)
+                          : isHinted
+                              ? Colors.green.withAlpha(_pulseAnimation.value)
+                              : Colors.grey.withAlpha(25),
+                      borderColor: isCorrect
+                          ? Colors.green
+                          : isHinted
+                              ? Colors.green.withAlpha(200)
+                              : Colors.black.withAlpha(50),
+                      borderStrokeWidth: isCorrect || isHinted ? 2 : 0.5,
+                      isFilled: true,
+                      label: cp.countryName,
+                      labelStyle: widget.isPractice
+                          ? const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            )
+                          : const TextStyle(
+                              color: Colors.transparent,
+                            ),
+                    );
+                  });
+                }).toList(),
+              );
+            },
           ),
         ],
       ),

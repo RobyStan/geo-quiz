@@ -5,7 +5,7 @@ import '../widgets/world_map_find_capital.dart';
 import 'home_screen.dart';
 import 'choose_region_screen.dart';
 import '../models/game_type.dart';
-import '../data/countries_test.dart';
+import '../data/countries.dart';
 
 class FindTheCapitalScreen extends StatefulWidget {
   final String region;
@@ -38,6 +38,8 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
 
   final Set<String> _correctCountryCodes = {};
 
+  String? _hintedCountryCode; 
+
   @override
   void initState() {
     super.initState();
@@ -49,13 +51,13 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
         ? List.from(countries)
         : countries
             .where((country) =>
-                country['region']?.toLowerCase() ==
-                widget.region.toLowerCase())
+                country['region']?.toLowerCase() == widget.region.toLowerCase())
             .toList();
 
     gameOver = false;
     _wrongAttempts = 0;
     _correctCountryCodes.clear();
+    _hintedCountryCode = null;
 
     _pickNewCapital();
 
@@ -124,7 +126,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   }
 
   void _restartGame() {
-    _worldMapKey = UniqueKey(); 
+    _worldMapKey = UniqueKey();
     _initGame();
   }
 
@@ -137,6 +139,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
       _onGameFinished();
     } else {
       currentTarget = unguessed[Random().nextInt(unguessed.length)];
+      _hintedCountryCode = null; 
     }
   }
 
@@ -160,6 +163,14 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
     } else {
       _handleWrongAttempt();
     }
+  }
+
+  void _showHint() {
+    if (_hintedCountryCode != null || currentTarget.isEmpty) return;
+
+    setState(() {
+      _hintedCountryCode = currentTarget['code'];
+    });
   }
 
   String _formatTime(int seconds) {
@@ -207,15 +218,29 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
               ),
             ),
           Expanded(
-            child: WorldMapFindCapital(
-              key: _worldMapKey,
-              region: widget.region,
-              isPractice: widget.isPractice,
-              countries: filteredCountries,
-              onGameOver: _onGameFinished,
-              onWrongAttempt: _handleWrongAttempt,
-              onCapitalTap: _handleCorrectCountryTap,
-              correctCountryCodes: _correctCountryCodes,
+            child: Stack(
+              children: [
+                WorldMapFindCapital(
+                  key: _worldMapKey,
+                  region: widget.region,
+                  isPractice: widget.isPractice,
+                  countries: filteredCountries,
+                  onGameOver: _onGameFinished,
+                  onWrongAttempt: _handleWrongAttempt,
+                  onCapitalTap: _handleCorrectCountryTap,
+                  correctCountryCodes: _correctCountryCodes,
+                  hintedCountryCode: _hintedCountryCode, 
+                ),
+                if (widget.isPractice)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: ElevatedButton(
+                      onPressed: _showHint,
+                      child: const Text('Hint'),
+                    ),
+                  ),
+              ],
             ),
           ),
           if (gameOver) ...[
@@ -250,7 +275,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
               child: const Text('Main Menu'),
             ),
             const SizedBox(height: 20),
-          ]
+          ],
         ],
       ),
     );
