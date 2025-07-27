@@ -155,14 +155,6 @@ class _WorldMapFindCountryState extends State<WorldMapFindCountry> {
     final zoom = _getRegionZoom(widget.region);
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          widget.onCountryTap != null
-              ? 'Tap the country for the capital'
-              : 'Find: (no target)', 
-        ),
-      ),
       body: FlutterMap(
         options: MapOptions(
           center: center,

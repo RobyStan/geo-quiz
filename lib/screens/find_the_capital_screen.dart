@@ -192,7 +192,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
       appBar: AppBar(
         title: Text(widget.isPractice
             ? 'Guess the Country by Capital'
-            : 'Timed - ${_formatTime(_remainingSeconds)}'),
+            : 'Time Left: ${_formatTime(_remainingSeconds)}'),
       ),
       body: Column(
         children: [

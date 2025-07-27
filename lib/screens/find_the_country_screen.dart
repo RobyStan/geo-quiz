@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../widgets/world_map_find_country.dart';
 import 'home_screen.dart';
@@ -36,6 +37,10 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
 
   Key _worldMapKey = UniqueKey();
 
+  Map<String, String>? currentTarget;
+
+  final Set<String> _correctCountryCodes = {}; 
+
   @override
   void initState() {
     super.initState();
@@ -51,7 +56,10 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
 
     gameOver = false;
     _wrongAttempts = 0;
+    _correctCountryCodes.clear();   
     _worldMapKey = UniqueKey();
+
+    _pickNewCountry();
 
     if (!widget.isPractice) {
       _timer?.cancel();
@@ -59,6 +67,14 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     }
 
     setState(() {});
+  }
+
+  void _pickNewCountry() {
+    if (filteredCountries.isEmpty) {
+      _onGameFinished();
+      return;
+    }
+    currentTarget = filteredCountries[Random().nextInt(filteredCountries.length)];
   }
 
   void _startTimer() {
@@ -121,20 +137,33 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     _initGame();
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  void _handleGameOver() {
+    _onGameFinished();
+  }
+
+  void _handleCorrectCountryTap(String tappedCountryCode) {
+    final tappedLower = tappedCountryCode.toLowerCase();
+    final targetCodeLower = currentTarget?['code']?.toLowerCase();
+
+    if (targetCodeLower != null && tappedLower == targetCodeLower) {
+      setState(() {
+        _correctCountryCodes.add(tappedLower);
+        filteredCountries.removeWhere((c) => c['code']?.toLowerCase() == tappedLower);
+        if (filteredCountries.isEmpty) {
+          _onGameFinished();
+        } else {
+          _pickNewCountry();
+        }
+      });
+    } else {
+      _handleWrongAttempt();
+    }
   }
 
   String _formatTime(int seconds) {
     final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
     final secs = (seconds % 60).toString().padLeft(2, '0');
     return '$minutes:$secs';
-  }
-
-  void _handleGameOver() {
-    _onGameFinished();
   }
 
   Widget _buildErrorCounter() {
@@ -150,25 +179,42 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.isPractice
             ? 'Practice Mode'
-            : 'Timed Mode - ${_formatTime(_remainingSeconds)}'),
+            : 'Time Left: ${_formatTime(_remainingSeconds)}'),
       ),
       body: Column(
         children: [
           _buildErrorCounter(),
 
+          if (!gameOver && currentTarget != null)
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                'Where is: ${currentTarget!['name']}?',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+            ),
+
           Expanded(
             child: WorldMapFindCountry(
-              key: _worldMapKey,  
+              key: _worldMapKey,
               region: widget.region,
               isPractice: widget.isPractice,
               countries: filteredCountries,
               onGameOver: _handleGameOver,
-              onWrongAttempt: _handleWrongAttempt, 
+              onWrongAttempt: _handleWrongAttempt,
+              onCountryTap: _handleCorrectCountryTap,
+              correctCountryCodes: _correctCountryCodes, 
             ),
           ),
 
@@ -203,7 +249,7 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
               child: const Text('Main Menu'),
             ),
             const SizedBox(height: 20),
-          ]
+          ],
         ],
       ),
     );
