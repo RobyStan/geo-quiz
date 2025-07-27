@@ -4,31 +4,31 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-class WorldMapFindCountry extends StatefulWidget {
+class WorldMapFindCapital extends StatefulWidget {
   final String region;
   final bool isPractice;
   final List<Map<String, String>> countries;
   final VoidCallback? onGameOver;
   final VoidCallback? onWrongAttempt;
-  final void Function(String countryCode)? onCountryTap;
+  final void Function(String countryCode)? onCapitalTap;
   final Set<String> correctCountryCodes;
 
-  const WorldMapFindCountry({
+  const WorldMapFindCapital({
     super.key,
     required this.region,
     required this.isPractice,
     required this.countries,
     this.onGameOver,
     this.onWrongAttempt,
-    this.onCountryTap,
+    this.onCapitalTap,
     this.correctCountryCodes = const {},
   });
 
   @override
-  State<WorldMapFindCountry> createState() => _WorldMapFindCountryState();
+  State<WorldMapFindCapital> createState() => _WorldMapFindCapitalState();
 }
 
-class _WorldMapFindCountryState extends State<WorldMapFindCountry> {
+class _WorldMapFindCapitalState extends State<WorldMapFindCapital> {
   final List<CountryPolygon> _allCountryPolygons = [];
   final List<CountryPolygon> _filteredCountryPolygons = [];
 
@@ -107,9 +107,8 @@ class _WorldMapFindCountryState extends State<WorldMapFindCountry> {
     final tappedCode = countryNameToCode[tappedCountryName];
     if (tappedCode == null) return;
 
-    if (widget.onCountryTap != null) {
-      widget.onCountryTap!(tappedCode);
-      return;
+    if (widget.onCapitalTap != null) {
+      widget.onCapitalTap!(tappedCode);
     }
   }
 

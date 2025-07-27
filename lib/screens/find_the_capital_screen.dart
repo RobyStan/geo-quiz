@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../widgets/world_map_find_country.dart';
+import '../widgets/world_map_find_capital.dart';
 import 'home_screen.dart';
 import 'choose_region_screen.dart';
 import '../models/game_type.dart';
@@ -207,14 +207,14 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
               ),
             ),
           Expanded(
-            child: WorldMapFindCountry(
+            child: WorldMapFindCapital(
               key: _worldMapKey,
               region: widget.region,
               isPractice: widget.isPractice,
               countries: filteredCountries,
               onGameOver: _onGameFinished,
               onWrongAttempt: _handleWrongAttempt,
-              onCountryTap: _handleCorrectCountryTap,
+              onCapitalTap: _handleCorrectCountryTap,
               correctCountryCodes: _correctCountryCodes,
             ),
           ),
