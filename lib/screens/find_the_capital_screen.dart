@@ -36,6 +36,8 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   int _wrongAttempts = 0;
   Key _worldMapKey = UniqueKey();
 
+  final Set<String> _correctCountryCodes = {};
+
   @override
   void initState() {
     super.initState();
@@ -53,7 +55,8 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
 
     gameOver = false;
     _wrongAttempts = 0;
-    _worldMapKey = UniqueKey();
+    _correctCountryCodes.clear();
+
     _pickNewCapital();
 
     if (!widget.isPractice) {
@@ -121,6 +124,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   }
 
   void _restartGame() {
+    _worldMapKey = UniqueKey(); 
     _initGame();
   }
 
@@ -137,16 +141,22 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   }
 
   void _handleCorrectCountryTap(String tappedCountryCode) {
-    if (tappedCountryCode.toLowerCase() == currentTarget['code']!.toLowerCase()) {
-      filteredCountries.removeWhere(
-          (country) => country['code'] == currentTarget['code']);
-      if (filteredCountries.isEmpty) {
-        _onGameFinished();
-      } else {
-        setState(() {
+    final tappedLower = tappedCountryCode.toLowerCase();
+    final currentCodeLower = currentTarget['code']!.toLowerCase();
+
+    if (tappedLower == currentCodeLower) {
+      setState(() {
+        _correctCountryCodes.add(tappedLower);
+
+        filteredCountries.removeWhere(
+            (country) => country['code']!.toLowerCase() == tappedLower);
+
+        if (filteredCountries.isEmpty) {
+          _onGameFinished();
+        } else {
           _pickNewCapital();
-        });
-      }
+        }
+      });
     } else {
       _handleWrongAttempt();
     }
@@ -205,6 +215,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
               onGameOver: _onGameFinished,
               onWrongAttempt: _handleWrongAttempt,
               onCountryTap: _handleCorrectCountryTap,
+              correctCountryCodes: _correctCountryCodes,
             ),
           ),
           if (gameOver) ...[

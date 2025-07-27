@@ -10,7 +10,8 @@ class WorldMapFindCountry extends StatefulWidget {
   final List<Map<String, String>> countries;
   final VoidCallback? onGameOver;
   final VoidCallback? onWrongAttempt;
-  final void Function(String countryCode)? onCountryTap; // nou
+  final void Function(String countryCode)? onCountryTap;
+  final Set<String> correctCountryCodes; 
 
   const WorldMapFindCountry({
     super.key,
@@ -20,6 +21,7 @@ class WorldMapFindCountry extends StatefulWidget {
     this.onGameOver,
     this.onWrongAttempt,
     this.onCountryTap,
+    this.correctCountryCodes = const {}, 
   });
 
   @override
@@ -29,10 +31,8 @@ class WorldMapFindCountry extends StatefulWidget {
 class _WorldMapFindCountryState extends State<WorldMapFindCountry> {
   final List<CountryPolygon> _allCountryPolygons = [];
   final List<CountryPolygon> _filteredCountryPolygons = [];
-  final Set<String> _correctCountries = {};
-  String? _targetCountry;
 
-  late Map<String, String> countryNameToCode; // nou
+  late Map<String, String> countryNameToCode;
 
   @override
   void initState() {
@@ -98,33 +98,9 @@ class _WorldMapFindCountryState extends State<WorldMapFindCountry> {
       );
 
       countryNameToCode = {
-        for (var c in widget.countries) c['name']!: c['code']!,
+        for (var c in widget.countries) c['name']!: c['code']!.toLowerCase(),
       };
-
-      _correctCountries.clear();
-      _chooseNextCountry();
     });
-  }
-
-  void _chooseNextCountry() {
-    if (widget.onCountryTap != null) return; 
-    final remaining = _filteredCountryPolygons
-        .map((c) => c.countryName)
-        .where((name) => !_correctCountries.contains(name))
-        .toList();
-
-    if (remaining.isEmpty) {
-      setState(() {
-        _targetCountry = null;
-      });
-
-      widget.onGameOver?.call();
-    } else {
-      remaining.shuffle();
-      setState(() {
-        _targetCountry = remaining.first;
-      });
-    }
   }
 
   void _handleTap(String tappedCountryName) {
@@ -133,21 +109,7 @@ class _WorldMapFindCountryState extends State<WorldMapFindCountry> {
 
     if (widget.onCountryTap != null) {
       widget.onCountryTap!(tappedCode);
-      setState(() {
-        _correctCountries.add(tappedCountryName);
-      });
       return;
-    }
-
-    if (_targetCountry == null) return;
-
-    if (tappedCountryName == _targetCountry) {
-      setState(() {
-        _correctCountries.add(tappedCountryName);
-        _chooseNextCountry();
-      });
-    } else {
-      widget.onWrongAttempt?.call();
     }
   }
 
@@ -198,7 +160,7 @@ class _WorldMapFindCountryState extends State<WorldMapFindCountry> {
         title: Text(
           widget.onCountryTap != null
               ? 'Tap the country for the capital'
-              : 'Find: ${_targetCountry ?? "Finished!"}',
+              : 'Find: (no target)', 
         ),
       ),
       body: FlutterMap(
@@ -220,7 +182,9 @@ class _WorldMapFindCountryState extends State<WorldMapFindCountry> {
           ),
           PolygonLayer(
             polygons: _filteredCountryPolygons.expand((cp) {
-              final isCorrect = _correctCountries.contains(cp.countryName);
+              final countryCode = countryNameToCode[cp.countryName];
+              final isCorrect =
+                  countryCode != null && widget.correctCountryCodes.contains(countryCode);
               return cp.rings.map((ring) {
                 return Polygon(
                   points: ring,
