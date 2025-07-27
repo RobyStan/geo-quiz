@@ -32,9 +32,9 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
       case 'europe':
         return 'assets/geo/europe.geo.json';
       case 'oceania':
-        return 'assets/geo/europe.geo.json';
+        return 'assets/geo/oceania.geo.json';
       case 'america':
-        return 'assets/geo/europe.geo.json';
+        return 'assets/geo/america.geo.json';
       case 'africa':
         return 'assets/geo/africa.geo.json';
       case 'asia':
