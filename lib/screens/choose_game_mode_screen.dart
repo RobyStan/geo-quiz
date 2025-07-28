@@ -69,7 +69,7 @@ class ChooseGameModeScreen extends StatelessWidget {
                       children: [
                         _buildModeButton(
                           context,
-                          label: 'Practice Mode',
+                          label: 'Practice Mode 📝',
                           onPressed: () {
                             _navigateToGameScreen(context, isPractice: true, timeLimit: timeLimit);
                           },
@@ -77,7 +77,7 @@ class ChooseGameModeScreen extends StatelessWidget {
                         const SizedBox(height: 20),
                         _buildModeButton(
                           context,
-                          label: 'Timed Mode',
+                          label: 'Timed Mode ⏳',
                           onPressed: () {
                             _navigateToGameScreen(context, isPractice: false, timeLimit: timeLimit);
                           },

@@ -17,6 +17,25 @@ class ChooseRegionScreen extends StatelessWidget {
         'Oceania',
       ];
 
+  String getEmojiForRegion(String region) {
+    switch(region) {
+      case 'World':
+        return '🌐';  
+      case 'Europe':
+        return '🏰';
+      case 'Asia':
+        return '🏯';
+      case 'Africa':
+        return '🐘';
+      case 'America':
+        return '🦅';
+      case 'Oceania':
+        return '🐨';
+      default:
+        return '❓';
+    }
+  }
+
   String getDescription() {
     switch (gameType) {
       case GameType.guessFlag:
@@ -83,7 +102,7 @@ class ChooseRegionScreen extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: Text(region),
+                               child: Text('$region ${getEmojiForRegion(region)}'),
                             ),
                           ),
                         );

@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       _buildMenuButton(
                         context,
-                        label: 'Guess the Flag 🌍',
+                        label: 'Guess the Flag 🎏',
                         gameType: GameType.guessFlag,
                       ),
                       _buildMenuButton(
@@ -40,17 +40,17 @@ class HomeScreen extends StatelessWidget {
                       ),
                       _buildMenuButton(
                         context,
-                        label: 'Guess the Capital 🌍',
+                        label: 'Guess the Capital 🏛️',
                         gameType: GameType.guessTheCapital,
                       ),
                       _buildMenuButton(
                         context,
-                        label: 'Find the Country 🌍',
+                        label: 'Find the Country 🔍',
                         gameType: GameType.findTheCountry,
                       ),
                       _buildMenuButton(
                         context,
-                        label: 'Find the Capital 🌍',
+                        label: 'Find the Capital 🔎',
                         gameType: GameType.findTheCapital,
                       ),
                     ],

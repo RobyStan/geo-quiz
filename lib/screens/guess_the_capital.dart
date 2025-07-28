@@ -111,7 +111,7 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
       if (!widget.isPractice) countdownTimer?.cancel();
       setState(() {
         gameOver = true;
-        message = 'Game Over!';
+        message = 'You guessed all capitals!';
         messageColor = Colors.blue;
       });
     }
@@ -276,10 +276,11 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
             currentCountry['name'] ?? '',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
-          Text(
-            currentCountry['region'] ?? '',
-            style: const TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
-          ),
+          if (widget.region == 'World')
+            Text(
+              currentCountry['region'] ?? '',
+              style: const TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+            ),
           const SizedBox(height: 20),
           TextField(
             controller: _controller,
@@ -304,19 +305,22 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
 
           const SizedBox(height: 20),
           if (widget.isPractice)
-            TextButton(
+            TextButton.icon(
               onPressed: () {
                 setState(() {
                   message = 'Answer: ${currentCountry['capital']}';
                   messageColor = Colors.green;
                 });
               },
-              child: const Text('Reveal Answer'),
+              icon: const Icon(Icons.visibility),
+              label: const Text('Reveal Answer'),
             ),
-          TextButton(
-            onPressed: _skipFlag,
-            child: const Text('Skip'),
-          ),
+
+            TextButton.icon(
+              onPressed: _skipFlag,
+              icon: const Icon(Icons.skip_next_rounded),
+              label: const Text('Skip'),
+            ),
         ],
       ),
     );

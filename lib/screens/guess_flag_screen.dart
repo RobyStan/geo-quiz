@@ -111,7 +111,7 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
       if (!widget.isPractice) countdownTimer?.cancel();
       setState(() {
         gameOver = true;
-        message = 'Game Over!';
+        message = 'You guessed all flags!';
         messageColor = Colors.blue;
       });
     }
@@ -264,19 +264,22 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
           ),
         const SizedBox(height: 20),
         if (widget.isPractice)
-          TextButton(
+          TextButton.icon(
             onPressed: () {
               setState(() {
                 message = 'Answer: ${currentCountry['name']}';
                 messageColor = Colors.green;
               });
             },
-            child: const Text('Reveal Answer'),
+            icon: const Icon(Icons.visibility),
+            label: const Text('Reveal Answer'),
           ),
-        TextButton(
-          onPressed: _skipFlag,
-          child: const Text('Skip'),
-        ),
+
+          TextButton.icon(
+            onPressed: _skipFlag,
+            icon: const Icon(Icons.skip_next_rounded),
+            label: const Text('Skip'),
+          ),
       ],
     );
   }

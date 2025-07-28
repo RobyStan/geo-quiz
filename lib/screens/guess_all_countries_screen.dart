@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-//import '../data/countries_test.dart'; 
-import '../data/countries.dart'; 
+import '../data/countries_test.dart'; 
+//import '../data/countries.dart'; 
 import 'home_screen.dart';
 import '../widgets/world_map_widgets.dart';
 import '../models/game_type.dart';
@@ -118,7 +118,7 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
 
       if (guessedCountries.length == allCountries.length) {
         gameOver = true;
-        message = 'You guessed all countries! 🎉';
+        message = 'You guessed all countries!';
         messageColor = Colors.green;
         countdownTimer?.cancel();
       }
@@ -171,99 +171,166 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Guess All Countries: ${widget.region}',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'Back',
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      IconButton(
+                        tooltip: 'Main Menu',
+                        icon: const Icon(Icons.home),
+                        onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (_) => const HomeScreen()),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              Expanded(
+                child: Center(
+                  child: gameOver ? _buildGameOverUI() : _buildGameUI(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGameUI() {
     final total = allCountries.length;
     final guessed = guessedCountries.length;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Guess All Countries: ${widget.region}'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            if (!widget.isPractice)
-              Text(
-                'Time Left: ${_formatTime(secondsLeft)}',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-            const SizedBox(height: 10),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!widget.isPractice)
             Text(
-              'Guessed: $guessed / $total',
-              style: const TextStyle(fontSize: 18),
+              'Time Left: ${_formatTime(secondsLeft)}',
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                labelText: 'Type a country name',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: _checkAnswer,
-              enabled: !gameOver,
+          const SizedBox(height: 10),
+          Text(
+            'Guessed: $guessed / $total',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              labelText: 'Type a country name',
+              border: OutlineInputBorder(),
             ),
-            const SizedBox(height: 10),
-            if (message.isNotEmpty)
-              Text(
+            onChanged: _checkAnswer,
+            enabled: !gameOver,
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 24,
+            child: Center(
+              child: Text(
                 message,
                 style: TextStyle(fontSize: 18, color: messageColor),
               ),
-            const SizedBox(height: 20),
-              Expanded(
-                child: Stack(
-                  children: [
-                    WorldMapScreen(
-                      region: widget.region,
-                      guessedCountries: guessedCountries,
-                    ),
-                    if (widget.isPractice)
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: ElevatedButton(
-                          onPressed: _showHint,
-                          child: const Text('Hint'),
-                        ),
-                      ),
-                  ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 300,
+            child: Stack(
+              children: [
+                WorldMapScreen(
+                  region: widget.region,
+                  guessedCountries: guessedCountries,
                 ),
-              ),
-            if (gameOver) ...[
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _restartGame,
-                child: const Text('Restart'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
+                if (widget.isPractice)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: ElevatedButton.icon(
+                      onPressed: _showHint,
+                      icon: const Icon(Icons.lightbulb),
+                      label: const Text('Hint'),
                     ),
-                    (route) => false,
-                  );
-                },
-                child: const Text('Change Region'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-                child: const Text('Main Menu'),
-              ),
-            ],
-          ],
-        ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildGameOverUI() {
+    final total = allCountries.length;
+    final guessed = guessedCountries.length;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          message,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Guessed $guessed / $total',
+          style: const TextStyle(fontSize: 18),
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _restartGame,
+            child: const Text('Restart'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
+                ),
+                (route) => false,
+              );
+            },
+            child: const Text('Change Region'),
+          ),
+        ),
+      ],
     );
   }
 }

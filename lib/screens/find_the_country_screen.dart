@@ -5,7 +5,7 @@ import '../widgets/world_map_find_country.dart';
 import 'home_screen.dart';
 import 'choose_region_screen.dart';
 import '../models/game_type.dart';
-import '../data/countries.dart';
+import '../data/countries_test.dart';
 
 class FindTheCountryScreen extends StatefulWidget {
   final String region;
@@ -203,84 +203,140 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.isPractice
-            ? 'Practice Mode'
-            : 'Time Left: ${_formatTime(_remainingSeconds)}'),
-      ),
-      body: Column(
-        children: [
-          _buildErrorCounter(),
-          if (!gameOver && currentTarget != null)
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Text(
-                'Where is: ${currentTarget!['name']}?',
-                style:
-                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-            ),
-          Expanded(
-            child: Stack(
-              children: [
-                WorldMapFindCountry(
-                  key: _worldMapKey,
-                  region: widget.region,
-                  isPractice: widget.isPractice,
-                  countries: filteredCountries,
-                  onGameOver: _handleGameOver,
-                  onWrongAttempt: _handleWrongAttempt,
-                  onCountryTap: _handleCorrectCountryTap,
-                  correctCountryCodes: _correctCountryCodes,
-                  hintedCountryCode: _hintedCountryCode, 
-                ),
-                if (widget.isPractice)
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: ElevatedButton(
-                      onPressed: _showHint,
-                      child: const Text('Hint'),
-                    ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                       widget.isPractice
+                            ? 'Practice Mode'
+                            : 'Time Left: ${_formatTime(_remainingSeconds)}',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-              ],
+                  Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'Back',
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      IconButton(
+                        tooltip: 'Main Menu',
+                        icon: const Icon(Icons.home),
+                        onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (_) => const HomeScreen()),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              Expanded(
+                child: Center(
+                  child: gameOver ? _buildGameOverUI() : _buildGameUI(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGameUI() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildErrorCounter(),
+        if (currentTarget != null)
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Text(
+              'Where is: ${currentTarget!['name']}?',
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ),
-          if (gameOver) ...[
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _restartGame,
-              child: const Text('Restart'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        ChooseRegionScreen(gameType: widget.gameType),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 400,
+          child: Stack(
+            children: [
+              WorldMapFindCountry(
+                key: _worldMapKey,
+                region: widget.region,
+                isPractice: widget.isPractice,
+                countries: filteredCountries,
+                onGameOver: _handleGameOver,
+                onWrongAttempt: _handleWrongAttempt,
+                onCountryTap: _handleCorrectCountryTap,
+                correctCountryCodes: _correctCountryCodes,
+                hintedCountryCode: _hintedCountryCode,
+              ),
+              if (widget.isPractice)
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: ElevatedButton(
+                    onPressed: _showHint,
+                    child: const Text('Hint'),
                   ),
-                  (route) => false,
-                );
-              },
-              child: const Text('Change Region'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                  (route) => false,
-                );
-              },
-              child: const Text('Main Menu'),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ],
-      ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGameOverUI() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          'You found all countries on the map!',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Wrong attempts: $_wrongAttempts',
+          style: const TextStyle(fontSize: 18, color: Colors.red),
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _restartGame,
+            child: const Text('Restart'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
+                ),
+                (route) => false,
+              );
+            },
+            child: const Text('Change Region'),
+          ),
+        ),
+      ],
     );
   }
 }
