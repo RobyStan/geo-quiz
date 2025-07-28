@@ -5,7 +5,7 @@ import '../widgets/world_map_find_country.dart';
 import 'home_screen.dart';
 import 'choose_region_screen.dart';
 import '../models/game_type.dart';
-import '../data/countries_test.dart';
+import '../data/countries.dart';
 
 class FindTheCountryScreen extends StatefulWidget {
   final String region;

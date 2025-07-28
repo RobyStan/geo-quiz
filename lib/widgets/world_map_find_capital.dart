@@ -158,7 +158,13 @@ class _WorldMapFindCapitalState extends State<WorldMapFindCapital>
   }
 
   void _handleMapTap(LatLng point) {
-    for (final country in _filteredCountryPolygons) {
+    final sortedCountries = [..._filteredCountryPolygons]..sort((a, b) {
+      final aSize = a.rings.fold<int>(0, (sum, ring) => sum + ring.length);
+      final bSize = b.rings.fold<int>(0, (sum, ring) => sum + ring.length);
+      return aSize.compareTo(bSize); 
+    });
+
+    for (final country in sortedCountries) {
       for (final ring in country.rings) {
         if (_isPointInPolygon(point, ring)) {
           _handleTap(country.countryName);
