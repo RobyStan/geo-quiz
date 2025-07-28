@@ -183,7 +183,30 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Guess the Flag: ${widget.region}')),
+      appBar: AppBar(
+        title: Text('Guess the Flag: ${widget.region}'),
+        automaticallyImplyLeading: false, 
+        actions: [
+          IconButton(
+            tooltip: 'Back',
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          IconButton(
+            tooltip: 'Main Menu',
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Center(
@@ -210,12 +233,15 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 20),
-        Image.asset(
-          'icons/flags/png/${currentCountry['code']}.png',
-          package: 'country_icons',
-          width: 250,
-          fit: BoxFit.contain,
-        ),
+          SizedBox(
+            width: 250,
+            height: 150,  
+            child: Image.asset(
+              'icons/flags/png/${currentCountry['code']}.png',
+              package: 'country_icons',
+              fit: BoxFit.contain,
+            ),
+          ),
         const SizedBox(height: 20),
         TextField(
           controller: _controller,
@@ -227,10 +253,14 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
           enabled: !gameOver,
         ),
         const SizedBox(height: 12),
-        if (message.isNotEmpty)
-          Text(
-            message,
-            style: TextStyle(fontSize: 18, color: messageColor),
+         SizedBox(
+            height: 24,  
+            child: Center(
+              child: Text(
+                message,
+                style: TextStyle(fontSize: 18, color: messageColor),
+              ),
+            ),
           ),
         const SizedBox(height: 20),
         if (widget.isPractice)
@@ -266,35 +296,30 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
           style: const TextStyle(fontSize: 18),
         ),
         const SizedBox(height: 24),
-        ElevatedButton(
-          onPressed: () {
-            _restartGame();
-          },
-          child: const Text('Restart'),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              _restartGame();
+            },
+            child: const Text('Restart'),
+          ),
         ),
         const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
-              ),
-              (route) => false,
-            );
-          },
-          child: const Text('Change Region'),
-        ),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
-              (route) => false,
-            );
-          },
-          child: const Text('Main Menu'),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
+                ),
+                (route) => false,
+              );
+            },
+            child: const Text('Change Region'),
+          ),
         ),
       ],
     );

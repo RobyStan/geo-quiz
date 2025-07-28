@@ -191,83 +191,134 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Guess the Capital: ${widget.region}')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: gameOver || remainingCountries.isEmpty
-              ? _buildGameOverUI()
-              : _buildGameUI(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Guess the Capital: ${widget.region}',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'Back',
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      IconButton(
+                        tooltip: 'Main Menu',
+                        icon: const Icon(Icons.home),
+                        onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (_) => const HomeScreen()),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              Expanded(
+                child: Center(
+                  child: gameOver || remainingCountries.isEmpty
+                      ? _buildGameOverUI()
+                      : _buildGameUI(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildGameUI() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (!widget.isPractice)
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!widget.isPractice)
+            Text(
+              'Time Left: ${_formatTime(secondsLeft)}',
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+          const SizedBox(height: 8),
           Text(
-            'Time Left: ${_formatTime(secondsLeft)}',
+            '$correctCount / $totalCountries',
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 250,
+            height: 150, 
+            child: Image.asset(
+              'icons/flags/png/${currentCountry['code']}.png',
+              package: 'country_icons',
+              fit: BoxFit.contain,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+          Text(
+            currentCountry['name'] ?? '',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
-        const SizedBox(height: 8),
-        Text(
-          '$correctCount / $totalCountries',
-          style: const TextStyle(fontSize: 16),
-        ),
-        const SizedBox(height: 20),
-        Image.asset(
-          'icons/flags/png/${currentCountry['code']}.png',
-          package: 'country_icons',
-          width: 250,
-          fit: BoxFit.contain,
-        ),
-        const SizedBox(height: 12),
-        Text(
-          currentCountry['name'] ?? '',
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          currentCountry['region'] ?? '',
-          style: const TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
-        ),
-        const SizedBox(height: 20),
-        TextField(
-          controller: _controller,
-          decoration: const InputDecoration(
-            labelText: 'Type the capital city',
-            border: OutlineInputBorder(),
-          ),
-          onChanged: _checkAnswer,
-          enabled: !gameOver,
-        ),
-        const SizedBox(height: 12),
-        if (message.isNotEmpty)
           Text(
-            message,
-            style: TextStyle(fontSize: 18, color: messageColor),
+            currentCountry['region'] ?? '',
+            style: const TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
           ),
-        const SizedBox(height: 20),
-        if (widget.isPractice)
+          const SizedBox(height: 20),
+          TextField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              labelText: 'Type the capital city',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: _checkAnswer,
+            enabled: !gameOver,
+          ),
+          const SizedBox(height: 12),
+
+          SizedBox(
+            height: 24,
+            child: Center(
+              child: Text(
+                message,
+                style: TextStyle(fontSize: 18, color: messageColor),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+          if (widget.isPractice)
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  message = 'Answer: ${currentCountry['capital']}';
+                  messageColor = Colors.green;
+                });
+              },
+              child: const Text('Reveal Answer'),
+            ),
           TextButton(
-            onPressed: () {
-              setState(() {
-                message = 'Answer: ${currentCountry['capital']}';
-                messageColor = Colors.green;
-              });
-            },
-            child: const Text('Reveal Answer'),
+            onPressed: _skipFlag,
+            child: const Text('Skip'),
           ),
-        TextButton(
-          onPressed: _skipFlag,
-          child: const Text('Skip'),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -286,35 +337,30 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
           style: const TextStyle(fontSize: 18),
         ),
         const SizedBox(height: 24),
-        ElevatedButton(
-          onPressed: () {
-            _restartGame();
-          },
-          child: const Text('Restart'),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              _restartGame();
+            },
+            child: const Text('Restart'),
+          ),
         ),
         const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
-              ),
-              (route) => false,
-            );
-          },
-          child: const Text('Change Region'),
-        ),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
-              (route) => false,
-            );
-          },
-          child: const Text('Main Menu'),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
+                ),
+                (route) => false,
+              );
+            },
+            child: const Text('Change Region'),
+          ),
         ),
       ],
     );
