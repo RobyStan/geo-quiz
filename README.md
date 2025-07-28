@@ -9,7 +9,7 @@ Geo Quiz is an interactive Flutter app where users can guess countries, flags, o
 - Guess the capital of countries
 - Find the country by tapping on the correct region
 - Find the capital by tapping on the correct country
-- Choose a region: Asia, Europe, America, Africa, and more
+- Choose a region: Asia, Europe, America, Africa, and Oceania
 - "World" mode with all countries included
 - Practice mode to learn at your own pace
 - Timed mode to challenge your speed and accuracy
