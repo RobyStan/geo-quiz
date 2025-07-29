@@ -5,7 +5,7 @@ import '../widgets/world_map_find_country.dart';
 import 'home_screen.dart';
 import 'choose_region_screen.dart';
 import '../models/game_type.dart';
-import '../data/countries_test.dart';
+import '../data/countries.dart';
 
 class FindTheCountryScreen extends StatefulWidget {
   final String region;
@@ -27,21 +27,15 @@ class FindTheCountryScreen extends StatefulWidget {
 
 class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
   Timer? _timer;
-  int _remainingSeconds = 0;
+  int secondsLeft = 0;
 
   late List<Map<String, String>> filteredCountries;
-
   bool gameOver = false;
-
   int _wrongAttempts = 0;
-
   Key _worldMapKey = UniqueKey();
-
   Map<String, String>? currentTarget;
-
   final Set<String> _correctCountryCodes = {};
-
-  String? _hintedCountryCode; 
+  String? _hintedCountryCode;
 
   @override
   void initState() {
@@ -54,8 +48,7 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
         ? List.from(countries)
         : countries
             .where((country) =>
-                country['region']?.toLowerCase() ==
-                widget.region.toLowerCase())
+                country['region']?.toLowerCase() == widget.region.toLowerCase())
             .toList();
 
     gameOver = false;
@@ -79,23 +72,22 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
       _onGameFinished();
       return;
     }
-    currentTarget =
-        filteredCountries[Random().nextInt(filteredCountries.length)];
-    _hintedCountryCode = null; 
+    currentTarget = filteredCountries[Random().nextInt(filteredCountries.length)];
+    _hintedCountryCode = null;
   }
 
   void _startTimer() {
     setState(() {
-      _remainingSeconds = widget.timeLimitMinutes * 60;
+      secondsLeft = widget.timeLimitMinutes * 60;
     });
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingSeconds == 0) {
+      if (secondsLeft == 0) {
         timer.cancel();
         _showTimeUpDialog();
       } else {
         setState(() {
-          _remainingSeconds--;
+          secondsLeft--;
         });
       }
     });
@@ -105,7 +97,7 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Time's up!"),
+        title: const Text("⏰ Time's up!"),
         content: const Text('Your time is over.'),
         actions: [
           TextButton(
@@ -170,7 +162,6 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
 
   void _showHint() {
     if (_hintedCountryCode != null || currentTarget == null) return;
-
     setState(() {
       _hintedCountryCode = currentTarget!['code'];
     });
@@ -182,103 +173,116 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     return '$minutes:$secs';
   }
 
-  Widget _buildErrorCounter() {
-    if (widget.isPractice) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        'Wrong attempts: $_wrongAttempts',
-        style: const TextStyle(fontSize: 18, color: Colors.red),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/find_the_country.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(color: Colors.black.withAlpha(100)),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.isPractice
-                        ? 'Practice Mode'
-                        : 'Time Left: ${_formatTime(_remainingSeconds)}',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        tooltip: 'Back',
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () => Navigator.pop(context),
+                      Flexible(
+                        child: Text(
+                          widget.isPractice
+                              ? 'Guess the country'
+                              : 'Time Left: ${_formatTime(secondsLeft)}',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+                          ),
+                        ),
                       ),
-                      IconButton(
-                        tooltip: 'Main Menu',
-                        icon: const Icon(Icons.home),
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (_) => const HomeScreen()),
-                            (route) => false,
-                          );
-                        },
+                      Row(
+                        children: [
+                          IconButton(
+                            tooltip: 'Back',
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          IconButton(
+                            tooltip: 'Main Menu',
+                            icon: const Icon(Icons.home, color: Colors.white),
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                (route) => false,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: gameOver
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: _buildGameOverUI(),
+                            ),
+                          )
+                        : _buildGameUI(),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: gameOver
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: _buildGameOverUI(),
-                      ),
-                    )
-                  : _buildGameUI(),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-
- Widget _buildGameUI() {
-  return Column(
-    children: [
-      _buildErrorCounter(),
-      if (currentTarget != null)
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Align(
-            alignment: Alignment.centerLeft,
+  Widget _buildGameUI() {
+    return Column(
+      children: [
+        if (!widget.isPractice)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Where is: ${currentTarget!['name']}?',
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              '❌ $_wrongAttempts mistakes',
+              style: const TextStyle(fontSize: 18, color: Colors.redAccent),
             ),
           ),
-        ),
-      Expanded(
-        child: Padding(
-          padding: EdgeInsets.zero, 
+        if (currentTarget != null && currentTarget!.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Text(
+              'Where is: ${currentTarget!['name']}?',
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+              ),
+            ),
+          ),
+        Expanded(
           child: Stack(
-            fit: StackFit.expand,
             children: [
               WorldMapFindCountry(
                 key: _worldMapKey,
@@ -295,13 +299,20 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
                 Positioned(
                   top: 10,
                   right: 10,
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     onPressed: _showHint,
-                    child: const Text('Hint'),
+                    icon: const Icon(Icons.visibility, color: Colors.greenAccent),
+                    label: const Text(
+                      'Hint',
+                      style: TextStyle(color: Colors.greenAccent),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white.withAlpha(175),
+                      foregroundColor: Colors.black,
+                    ),
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ],
@@ -313,19 +324,48 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Text(
-          'You found all countries on the map!',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          '🎉 You found all countries!',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            shadows: [
+              Shadow(
+                blurRadius: 4,
+                color: Colors.black,
+                offset: Offset(1, 1),
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
         Text(
-          'Wrong attempts: $_wrongAttempts',
-          style: const TextStyle(fontSize: 18, color: Colors.red),
+          '❌ $_wrongAttempts mistakes',
+          style: const TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+            shadows: [
+              Shadow(
+                blurRadius: 4,
+                color: Colors.black,
+                offset: Offset(1, 1),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _restartGame,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(175),
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
             child: const Text('Restart 🔁'),
           ),
         ),
@@ -342,7 +382,14 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
                 (route) => false,
               );
             },
-            child: const Text('Change Region 🗺️'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(175),
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: const Text('Change Region 🌍'),
           ),
         ),
       ],

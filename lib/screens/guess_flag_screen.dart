@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geo_quiz_app/screens/home_screen.dart';
-import '../data/countries_test.dart';
+import '../data/countries.dart';
 import '../models/game_type.dart';
 import 'choose_region_screen.dart';
 
@@ -38,7 +38,7 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
   int correctCount = 0;
 
   bool gameOver = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -183,37 +183,70 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Guess the Flag: ${widget.region}'),
-        automaticallyImplyLeading: false, 
-        actions: [
-          IconButton(
-            tooltip: 'Back',
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/guess_the_flag.jpg',
+              fit: BoxFit.cover,
+            ),
           ),
-          IconButton(
-            tooltip: 'Main Menu',
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
-                (route) => false,
-              );
-            },
+          Positioned.fill(
+            child: Container(color: Colors.black.withAlpha(100)),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Guess the Flag: ${widget.region}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [Shadow(blurRadius: 4, color: Colors.black, offset: Offset(1, 1))],
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            tooltip: 'Back',
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          IconButton(
+                            tooltip: 'Main Menu',
+                            icon: const Icon(Icons.home, color: Colors.white),
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                (route) => false,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: Center(
+                      child: gameOver || remainingCountries.isEmpty
+                          ? _buildGameOverUI()
+                          : _buildGameUI(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: gameOver || remainingCountries.isEmpty
-              ? _buildGameOverUI()
-              : _buildGameUI(),
-        ),
       ),
     );
   }
@@ -225,61 +258,81 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
         if (!widget.isPractice)
           Text(
             'Time Left: ${_formatTime(secondsLeft)}',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
         const SizedBox(height: 8),
         Text(
           '$correctCount / $totalCountries',
-          style: const TextStyle(fontSize: 16),
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+          ),
         ),
         const SizedBox(height: 20),
-          SizedBox(
-            width: 250,
-            height: 150,  
-            child: Image.asset(
-              'icons/flags/png/${currentCountry['code']}.png',
-              package: 'country_icons',
-              fit: BoxFit.contain,
-            ),
+        SizedBox(
+          width: 250,
+          height: 150,
+          child: Image.asset(
+            'icons/flags/png/${currentCountry['code']}.png',
+            package: 'country_icons',
+            fit: BoxFit.contain,
           ),
+        ),
         const SizedBox(height: 20),
         TextField(
           controller: _controller,
-          decoration: const InputDecoration(
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
             labelText: 'Type the country name',
-            border: OutlineInputBorder(),
+            labelStyle: const TextStyle(color: Colors.white),
+            border: const OutlineInputBorder(),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
           ),
           onChanged: _checkAnswer,
           enabled: !gameOver,
         ),
         const SizedBox(height: 12),
-         SizedBox(
-            height: 24,  
-            child: Center(
-              child: Text(
-                message,
-                style: TextStyle(fontSize: 18, color: messageColor),
-              ),
+        SizedBox(
+          height: 24,
+          child: Center(
+            child: Text(
+              message,
+              style: TextStyle(fontSize: 18, color: messageColor),
             ),
           ),
+        ),
         const SizedBox(height: 20),
         if (widget.isPractice)
           TextButton.icon(
             onPressed: () {
               setState(() {
                 message = 'Answer: ${currentCountry['name']}';
-                messageColor = Colors.green;
+                messageColor = Colors.greenAccent;
               });
             },
-            icon: const Icon(Icons.visibility),
-            label: const Text('Reveal Answer'),
+            icon: const Icon(Icons.visibility, color: Colors.greenAccent),
+            label: const Text(
+              'Reveal Answer',
+              style: TextStyle(color: Colors.greenAccent),
+            ),
           ),
-
-          TextButton.icon(
-            onPressed: _skipFlag,
-            icon: const Icon(Icons.skip_next_rounded),
-            label: const Text('Skip'),
+        TextButton.icon(
+          onPressed: _skipFlag,
+          icon: const Icon(Icons.skip_next_rounded, color: Colors.orangeAccent),
+          label: const Text(
+            'Skip',
+            style: TextStyle(color: Colors.orangeAccent),
           ),
+        ),
       ],
     );
   }
@@ -290,18 +343,22 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
       children: [
         Text(
           message,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
         Text(
           ' Guessed $correctCount / $totalCountries',
-          style: const TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18, color: Colors.white),
         ),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(175),
+              foregroundColor: Colors.black,
+            ),
             onPressed: () {
               _restartGame();
             },
@@ -312,6 +369,10 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(175),
+              foregroundColor: Colors.black,
+            ),
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,

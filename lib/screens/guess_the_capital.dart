@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geo_quiz_app/screens/home_screen.dart';
-import '../data/countries_test.dart';
+import '../data/countries.dart';
 import '../models/game_type.dart';
 import 'choose_region_screen.dart';
 
@@ -191,56 +191,75 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/guess_the_capital.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withAlpha(100), 
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Guess the Capital: ${widget.region}',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        tooltip: 'Back',
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () => Navigator.pop(context),
+                      Text(
+                        'Guess the Capital: ${widget.region}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [Shadow(blurRadius: 4, color: Colors.black, offset: Offset(1, 1))],
+                        ),
                       ),
-                      IconButton(
-                        tooltip: 'Main Menu',
-                        icon: const Icon(Icons.home),
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (_) => const HomeScreen()),
-                            (route) => false,
-                          );
-                        },
+                      Row(
+                        children: [
+                          IconButton(
+                            tooltip: 'Back',
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          IconButton(
+                            tooltip: 'Main Menu',
+                            icon: const Icon(Icons.home, color: Colors.white),
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                (route) => false,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: Center(
+                      child: gameOver || remainingCountries.isEmpty
+                          ? _buildGameOverUI()
+                          : _buildGameUI(),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              Expanded(
-                child: Center(
-                  child: gameOver || remainingCountries.isEmpty
-                      ? _buildGameOverUI()
-                      : _buildGameUI(),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -253,46 +272,71 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
           if (!widget.isPractice)
             Text(
               'Time Left: ${_formatTime(secondsLeft)}',
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [Shadow(blurRadius: 3, color: Colors.black)],
+              ),
             ),
           const SizedBox(height: 8),
           Text(
             '$correctCount / $totalCountries',
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+              shadows: [Shadow(blurRadius: 2, color: Colors.black)],
+            ),
           ),
           const SizedBox(height: 20),
           SizedBox(
             width: 250,
-            height: 150, 
+            height: 150,
             child: Image.asset(
               'icons/flags/png/${currentCountry['code']}.png',
               package: 'country_icons',
               fit: BoxFit.contain,
             ),
           ),
-
           const SizedBox(height: 12),
           Text(
             currentCountry['name'] ?? '',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+            ),
           ),
           if (widget.region == 'World')
             Text(
               currentCountry['region'] ?? '',
-              style: const TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+              style: const TextStyle(
+                fontSize: 18,
+                fontStyle: FontStyle.italic,
+                color: Colors.white,
+                shadows: [Shadow(blurRadius: 2, color: Colors.black)],
+              ),
             ),
           const SizedBox(height: 20),
           TextField(
             controller: _controller,
-            decoration: const InputDecoration(
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
               labelText: 'Type the capital city',
+              labelStyle: const TextStyle(color: Colors.white),
               border: OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
             ),
             onChanged: _checkAnswer,
             enabled: !gameOver,
           ),
           const SizedBox(height: 12),
-
           SizedBox(
             height: 24,
             child: Center(
@@ -302,7 +346,6 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
               ),
             ),
           ),
-
           const SizedBox(height: 20),
           if (widget.isPractice)
             TextButton.icon(
@@ -312,15 +355,20 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
                   messageColor = Colors.green;
                 });
               },
-              icon: const Icon(Icons.visibility),
-              label: const Text('Reveal Answer'),
+              icon: const Icon(Icons.visibility, color: Colors.greenAccent),
+              label: const Text(
+                'Reveal Answer',
+                style: TextStyle(color: Colors.greenAccent),
+              ),
             ),
-
-            TextButton.icon(
-              onPressed: _skipFlag,
-              icon: const Icon(Icons.skip_next_rounded),
-              label: const Text('Skip'),
+          TextButton.icon(
+            onPressed: _skipFlag,
+            icon: const Icon(Icons.skip_next_rounded, color: Colors.orangeAccent),
+            label: const Text(
+              'Skip',
+              style: TextStyle(color: Colors.orangeAccent),
             ),
+          ),
         ],
       ),
     );
@@ -332,18 +380,31 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
       children: [
         Text(
           message,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
         Text(
           ' Guessed $correctCount / $totalCountries',
-          style: const TextStyle(fontSize: 18),
+          style: const TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+            shadows: [Shadow(blurRadius: 3, color: Colors.black)],
+          ),
         ),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white.withAlpha(175), 
+            foregroundColor: Colors.black, 
+            ),
             onPressed: () {
               _restartGame();
             },
@@ -354,6 +415,10 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white.withAlpha(175), 
+            foregroundColor: Colors.black, 
+            ),
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,

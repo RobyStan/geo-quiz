@@ -63,6 +63,14 @@ flutter:
     - assets/geo/america.geo.json
     - assets/geo/asia.geo.json
     - assets/geo/oceania.geo.json
+    - assets/images/home_screen.jpg
+    - assets/images/choose_region.jpg
+    - assets/images/choose_game_mode.jpg
+    - assets/images/guess_the_capital.jpg
+    - assets/images/guess_the_flag.jpg
+    - assets/images/find_the_capital.jpg
+    - assets/images/find_the_country.jpg
+    - assets/images/guess_all_countries.jpg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

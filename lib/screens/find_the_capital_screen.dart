@@ -5,7 +5,7 @@ import '../widgets/world_map_find_capital.dart';
 import 'home_screen.dart';
 import 'choose_region_screen.dart';
 import '../models/game_type.dart';
-import '../data/countries_test.dart';
+import '../data/countries.dart';
 
 class FindTheCapitalScreen extends StatefulWidget {
   final String region;
@@ -27,7 +27,7 @@ class FindTheCapitalScreen extends StatefulWidget {
 
 class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   Timer? _timer;
-  int _remainingSeconds = 0;
+  int secondsLeft = 0;
 
   late List<Map<String, String>> filteredCountries;
   late Map<String, String> currentTarget;
@@ -70,22 +70,25 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
 
   void _startTimer() {
     setState(() {
-      _remainingSeconds = widget.timeLimitMinutes * 60;
+      secondsLeft = widget.timeLimitMinutes * 60;
     });
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingSeconds == 0) {
+      if (secondsLeft == 0) {
         timer.cancel();
         _showTimeUpDialog();
       } else {
         setState(() {
-          _remainingSeconds--;
+          secondsLeft--;
         });
       }
     });
   }
 
   void _showTimeUpDialog() {
+    setState(() {
+      gameOver = true;
+    });
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -177,18 +180,6 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
     return '$minutes:$secs';
   }
 
-  Widget _buildErrorCounter() {
-    if (widget.isPractice) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        'Wrong attempts: $_wrongAttempts',
-        style: const TextStyle(fontSize: 18, color: Colors.red),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _timer?.cancel();
@@ -198,55 +189,77 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/find_the_capital.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(color: Colors.black.withAlpha(100)),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.isPractice
-                        ? 'Guess the Country by Capital'
-                        : 'Time Left: ${_formatTime(_remainingSeconds)}',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        tooltip: 'Back',
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () => Navigator.pop(context),
+                      Flexible(
+                        child: Text(
+                          widget.isPractice
+                              ? 'Guess by Capital: ${widget.region}'
+                              : 'Time Left: ${_formatTime(secondsLeft)}',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+                          ),
+                        ),
                       ),
-                      IconButton(
-                        tooltip: 'Main Menu',
-                        icon: const Icon(Icons.home),
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (_) => const HomeScreen()),
-                            (route) => false,
-                          );
-                        },
+                      Row(
+                        children: [
+                          IconButton(
+                            tooltip: 'Back',
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          IconButton(
+                            tooltip: 'Main Menu',
+                            icon: const Icon(Icons.home, color: Colors.white),
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                (route) => false,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: gameOver
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: _buildGameOverUI(),
+                            ),
+                          )
+                        : _buildGameUI(),
                   ),
                 ],
               ),
             ),
-            Expanded(
-              child: gameOver
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: _buildGameOverUI(),
-                      ),
-                    )
-                  : _buildGameUI(),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -254,13 +267,25 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   Widget _buildGameUI() {
     return Column(
       children: [
-        _buildErrorCounter(),
+        if (!widget.isPractice)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Wrong attempts: $_wrongAttempts',
+              style: const TextStyle(fontSize: 18, color: Colors.redAccent),
+            ),
+          ),
         if (currentTarget.isNotEmpty)
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Text(
               'Where is: ${currentTarget['capital']}?',
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+              ),
             ),
           ),
         Expanded(
@@ -281,9 +306,17 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
                 Positioned(
                   top: 10,
                   right: 10,
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     onPressed: _showHint,
-                    child: const Text('Hint'),
+                    icon: const Icon(Icons.visibility, color: Colors.greenAccent),
+                    label: const Text(
+                      'Hint',
+                      style: TextStyle(color: Colors.greenAccent),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white.withAlpha(175),
+                      foregroundColor: Colors.black,
+                    ),
                   ),
                 ),
             ],
@@ -299,18 +332,27 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
       children: [
         const Text(
           'You guessed all capitals!',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
         Text(
           'Wrong attempts: $_wrongAttempts',
-          style: const TextStyle(fontSize: 18, color: Colors.red),
+          style: const TextStyle(fontSize: 18, color: Colors.white),
         ),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _restartGame,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(175),
+              foregroundColor: Colors.black,
+            ),
             child: const Text('Restart 🔁'),
           ),
         ),
@@ -327,6 +369,10 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
                 (route) => false,
               );
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(175),
+              foregroundColor: Colors.black,
+            ),
             child: const Text('Change Region 🗺️'),
           ),
         ),

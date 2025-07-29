@@ -38,10 +38,21 @@ class ChooseGameModeScreen extends StatelessWidget {
     final timeLimit = getTimeLimitForRegion(region);
 
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Padding(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/choose_game_mode.jpg',  
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withAlpha(100), 
+            ),
+          ),
+          SafeArea(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
@@ -52,6 +63,8 @@ class ChooseGameModeScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [Shadow(blurRadius: 4, color: Colors.black87, offset: Offset(1,1))],
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -60,7 +73,7 @@ class ChooseGameModeScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Colors.black87,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -88,44 +101,49 @@ class ChooseGameModeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Positioned(
-              top: 12,
-              right: 12,
-              child: Row(
-                children: [
-                  IconButton(
-                    tooltip: 'Back',
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  IconButton(
-                    tooltip: 'Main Menu',
-                    icon: const Icon(Icons.home),
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => const HomeScreen()),
-                        (route) => false,
-                      );
-                    },
-                  ),
-                ],
-              ),
+          ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Row(
+              children: [
+                IconButton(
+                  tooltip: 'Back',
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                IconButton(
+                  tooltip: 'Main Menu',
+                  icon: const Icon(Icons.home, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildModeButton(BuildContext context,
-      {required String label, required VoidCallback onPressed}) {
+    {required String label, required VoidCallback onPressed}) {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white.withAlpha(175), 
+          foregroundColor: Colors.black,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
         onPressed: onPressed,
         child: Text(label),
       ),

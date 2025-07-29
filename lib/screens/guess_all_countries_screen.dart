@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../data/countries_test.dart'; 
+import '../data/countries.dart'; 
 import 'home_screen.dart';
 import '../widgets/world_map_widgets.dart';
 import '../models/game_type.dart';
@@ -172,55 +172,75 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/guess_all_countries.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(color: Colors.black.withAlpha(100)),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Guess All Countries: ${widget.region}',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        tooltip: 'Back',
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () => Navigator.pop(context),
+                      Flexible(
+                        child: Text(
+                          'Guess All Countries: ${widget.region}',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+                          ),
+                        ),
                       ),
-                      IconButton(
-                        tooltip: 'Main Menu',
-                        icon: const Icon(Icons.home),
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (_) => const HomeScreen()),
-                            (route) => false,
-                          );
-                        },
+                      Row(
+                        children: [
+                          IconButton(
+                            tooltip: 'Back',
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          IconButton(
+                            tooltip: 'Main Menu',
+                            icon: const Icon(Icons.home, color: Colors.white),
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                (route) => false,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: gameOver
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: _buildGameOverUI(),
+                            ),
+                          )
+                        : _buildGameUI(),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: gameOver
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: _buildGameOverUI(),
-                      ),
-                    )
-                  : _buildGameUI(),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -234,16 +254,25 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
       children: [
         if (!widget.isPractice)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               'Time Left: ${_formatTime(secondsLeft)}',
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+              ),
               textAlign: TextAlign.center,
             ),
           ),
         Text(
           'Guessed: $guessed / $total',
-          style: const TextStyle(fontSize: 18),
+          style: const TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+            shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 12),
@@ -251,12 +280,24 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: TextField(
             controller: _controller,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Type a country name',
-              border: OutlineInputBorder(),
+              labelStyle: const TextStyle(color: Colors.white70),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white70),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.greenAccent),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              filled: true,
+              fillColor: Colors.white.withAlpha(30),
             ),
+            style: const TextStyle(color: Colors.white),
             onChanged: _checkAnswer,
             enabled: !gameOver,
+            cursorColor: Colors.greenAccent,
           ),
         ),
         const SizedBox(height: 8),
@@ -265,7 +306,11 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
           child: Center(
             child: Text(
               message,
-              style: TextStyle(fontSize: 18, color: messageColor),
+              style: TextStyle(
+                fontSize: 18,
+                color: messageColor,
+                shadows: const [Shadow(blurRadius: 3, color: Colors.black)],
+              ),
             ),
           ),
         ),
@@ -285,8 +330,18 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
                   right: 10,
                   child: ElevatedButton.icon(
                     onPressed: _showHint,
-                    icon: const Icon(Icons.lightbulb),
-                    label: const Text('Hint'),
+                    icon: const Icon(Icons.visibility, color: Colors.greenAccent),
+                    label: const Text(
+                      'Hint',
+                      style: TextStyle(color: Colors.greenAccent),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white.withAlpha(175),
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -305,19 +360,39 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
       children: [
         Text(
           message,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            shadows: [
+              Shadow(blurRadius: 4, color: Colors.black, offset: Offset(1, 1)),
+            ],
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
         Text(
           'Guessed $guessed / $total',
-          style: const TextStyle(fontSize: 18),
+          style: const TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+            shadows: [
+              Shadow(blurRadius: 4, color: Colors.black, offset: Offset(1, 1)),
+            ],
+          ),
         ),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _restartGame,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(175),
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
             child: const Text('Restart 🔁'),
           ),
         ),
@@ -334,6 +409,13 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
                 (route) => false,
               );
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withAlpha(175),
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
             child: const Text('Change Region 🗺️'),
           ),
         ),
