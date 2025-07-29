@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../data/countries_test.dart'; 
-//import '../data/countries.dart'; 
 import 'home_screen.dart';
 import '../widgets/world_map_widgets.dart';
 import '../models/game_type.dart';
@@ -74,9 +73,7 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
   }
 
   void _showHint() {
-    if (currentHint != null) {
-      return;
-    }
+    if (currentHint != null) return;
     final notGuessed = allCountries
         .map((c) => c['name']!)
         .where((name) => !guessedCountries.contains(name))
@@ -176,12 +173,12 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -210,15 +207,19 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              Expanded(
-                child: Center(
-                  child: gameOver ? _buildGameOverUI() : _buildGameUI(),
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: gameOver
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: _buildGameOverUI(),
+                      ),
+                    )
+                  : _buildGameUI(),
+            ),
+          ],
         ),
       ),
     );
@@ -228,22 +229,27 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
     final total = allCountries.length;
     final guessed = guessedCountries.length;
 
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (!widget.isPractice)
-            Text(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (!widget.isPractice)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Text(
               'Time Left: ${_formatTime(secondsLeft)}',
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
-          const SizedBox(height: 10),
-          Text(
-            'Guessed: $guessed / $total',
-            style: const TextStyle(fontSize: 18),
           ),
-          const SizedBox(height: 20),
-          TextField(
+        Text(
+          'Guessed: $guessed / $total',
+          style: const TextStyle(fontSize: 18),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: TextField(
             controller: _controller,
             decoration: const InputDecoration(
               labelText: 'Type a country name',
@@ -252,40 +258,41 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
             onChanged: _checkAnswer,
             enabled: !gameOver,
           ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 24,
-            child: Center(
-              child: Text(
-                message,
-                style: TextStyle(fontSize: 18, color: messageColor),
-              ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 24,
+          child: Center(
+            child: Text(
+              message,
+              style: TextStyle(fontSize: 18, color: messageColor),
             ),
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 300,
-            child: Stack(
-              children: [
-                WorldMapScreen(
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: WorldMapScreen(
                   region: widget.region,
                   guessedCountries: guessedCountries,
                 ),
-                if (widget.isPractice)
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: ElevatedButton.icon(
-                      onPressed: _showHint,
-                      icon: const Icon(Icons.lightbulb),
-                      label: const Text('Hint'),
-                    ),
+              ),
+              if (widget.isPractice)
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: ElevatedButton.icon(
+                    onPressed: _showHint,
+                    icon: const Icon(Icons.lightbulb),
+                    label: const Text('Hint'),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -311,7 +318,7 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _restartGame,
-            child: const Text('Restart'),
+            child: const Text('Restart 🔁'),
           ),
         ),
         const SizedBox(height: 12),
@@ -327,7 +334,7 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
                 (route) => false,
               );
             },
-            child: const Text('Change Region'),
+            child: const Text('Change Region 🗺️'),
           ),
         ),
       ],

@@ -347,7 +347,7 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
             onPressed: () {
               _restartGame();
             },
-            child: const Text('Restart'),
+            child: const Text('Restart 🔁'),
           ),
         ),
         const SizedBox(height: 12),
@@ -363,7 +363,7 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
                 (route) => false,
               );
             },
-            child: const Text('Change Region'),
+            child: const Text('Change Region 🗺️'),
           ),
         ),
       ],

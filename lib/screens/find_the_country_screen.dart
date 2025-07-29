@@ -200,22 +200,22 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                       widget.isPractice
-                            ? 'Practice Mode'
-                            : 'Time Left: ${_formatTime(_remainingSeconds)}',
+                    widget.isPractice
+                        ? 'Practice Mode'
+                        : 'Time Left: ${_formatTime(_remainingSeconds)}',
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   Row(
@@ -240,37 +240,45 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              Expanded(
-                child: Center(
-                  child: gameOver ? _buildGameOverUI() : _buildGameUI(),
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: gameOver
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: _buildGameOverUI(),
+                      ),
+                    )
+                  : _buildGameUI(),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildGameUI() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildErrorCounter(),
-        if (currentTarget != null)
-          Padding(
-            padding: const EdgeInsets.all(12.0),
+
+ Widget _buildGameUI() {
+  return Column(
+    children: [
+      _buildErrorCounter(),
+      if (currentTarget != null)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
             child: Text(
               'Where is: ${currentTarget!['name']}?',
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 400,
+        ),
+      Expanded(
+        child: Padding(
+          padding: EdgeInsets.zero, 
           child: Stack(
+            fit: StackFit.expand,
             children: [
               WorldMapFindCountry(
                 key: _worldMapKey,
@@ -292,7 +300,8 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
                     child: const Text('Hint'),
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -317,7 +326,7 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _restartGame,
-            child: const Text('Restart'),
+            child: const Text('Restart 🔁'),
           ),
         ),
         const SizedBox(height: 12),
@@ -333,7 +342,7 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
                 (route) => false,
               );
             },
-            child: const Text('Change Region'),
+            child: const Text('Change Region 🗺️'),
           ),
         ),
       ],

@@ -305,7 +305,7 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
             onPressed: () {
               _restartGame();
             },
-            child: const Text('Restart'),
+            child: const Text('Restart 🔁'),
           ),
         ),
         const SizedBox(height: 12),
@@ -321,7 +321,7 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
                 (route) => false,
               );
             },
-            child: const Text('Change Region'),
+            child: const Text('Change Region 🗺️'),
           ),
         ),
       ],

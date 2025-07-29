@@ -37,8 +37,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   Key _worldMapKey = UniqueKey();
 
   final Set<String> _correctCountryCodes = {};
-
-  String? _hintedCountryCode; 
+  String? _hintedCountryCode;
 
   @override
   void initState() {
@@ -139,7 +138,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
       _onGameFinished();
     } else {
       currentTarget = unguessed[Random().nextInt(unguessed.length)];
-      _hintedCountryCode = null; 
+      _hintedCountryCode = null;
     }
   }
 
@@ -150,7 +149,6 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
     if (tappedLower == currentCodeLower) {
       setState(() {
         _correctCountryCodes.add(tappedLower);
-
         filteredCountries.removeWhere(
             (country) => country['code']!.toLowerCase() == tappedLower);
 
@@ -201,18 +199,17 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                     widget.isPractice
-                            ? 'Guess the Country by Capital'
-                            : 'Time Left: ${_formatTime(_remainingSeconds)}',
+                    widget.isPractice
+                        ? 'Guess the Country by Capital'
+                        : 'Time Left: ${_formatTime(_remainingSeconds)}',
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   Row(
@@ -237,15 +234,18 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              Expanded(
-                child: Center(
-                  child: gameOver ? _buildGameOverUI() : _buildGameUI(),
-                ),
-              ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: gameOver
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: _buildGameOverUI(),
+                      ),
+                    )
+                  : _buildGameUI(),
+            ),
+          ],
         ),
       ),
     );
@@ -253,7 +253,6 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
 
   Widget _buildGameUI() {
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
         _buildErrorCounter(),
         if (currentTarget.isNotEmpty)
@@ -264,9 +263,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 400,
+        Expanded(
           child: Stack(
             children: [
               WorldMapFindCapital(
@@ -314,7 +311,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _restartGame,
-            child: const Text('Restart'),
+            child: const Text('Restart 🔁'),
           ),
         ),
         const SizedBox(height: 12),
@@ -330,7 +327,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
                 (route) => false,
               );
             },
-            child: const Text('Change Region'),
+            child: const Text('Change Region 🗺️'),
           ),
         ),
       ],
