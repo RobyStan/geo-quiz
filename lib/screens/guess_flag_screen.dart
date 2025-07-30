@@ -347,7 +347,7 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
       children: [
         Text(
           message,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
@@ -378,14 +378,13 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
               foregroundColor: Colors.black,
             ),
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: widget.gameType),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),
-                (route) => false,
               );
             },
             child: const Text('Change Region 🗺️'),

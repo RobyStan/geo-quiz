@@ -424,14 +424,13 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
             foregroundColor: Colors.black, 
             ),
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: widget.gameType),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),
-                (route) => false,
               );
             },
             child: const Text('Change Region 🗺️'),

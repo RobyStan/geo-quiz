@@ -405,14 +405,13 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: widget.gameType),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),
-                (route) => false,
               );
             },
             style: ElevatedButton.styleFrom(

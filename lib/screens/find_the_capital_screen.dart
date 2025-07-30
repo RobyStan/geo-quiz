@@ -5,7 +5,7 @@ import '../widgets/world_map_find_capital.dart';
 import 'home_screen.dart';
 import 'choose_region_screen.dart';
 import '../models/game_type.dart';
-import '../data/countries.dart';
+import '../data/countries_test.dart';
 
 class FindTheCapitalScreen extends StatefulWidget {
   final String region;
@@ -76,42 +76,12 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (secondsLeft == 0) {
         timer.cancel();
-        _showTimeUpDialog();
       } else {
         setState(() {
           secondsLeft--;
         });
       }
     });
-  }
-
-  void _showTimeUpDialog() {
-    setState(() {
-      gameOver = true;
-    });
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Time's up!"),
-        content: const Text('Your time is over.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text('Back to Menu'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _restartGame();
-            },
-            child: const Text('Try Again'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _onGameFinished() {
@@ -275,7 +245,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Wrong attempts: $_wrongAttempts',
+              '❌ $_wrongAttempts mistakes',
               style: const TextStyle(fontSize: 18, color: Colors.redAccent),
             ),
           ),
@@ -339,14 +309,14 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Colors.white,
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
         Text(
-          'Wrong attempts: $_wrongAttempts',
-          style: const TextStyle(fontSize: 18, color: Colors.white),
+          '❌ $_wrongAttempts mistakes',
+          style: const TextStyle(fontSize: 18, color: Colors.redAccent),
         ),
         const SizedBox(height: 24),
         SizedBox(
@@ -365,14 +335,13 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: widget.gameType),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),
-                (route) => false,
               );
             },
             style: ElevatedButton.styleFrom(

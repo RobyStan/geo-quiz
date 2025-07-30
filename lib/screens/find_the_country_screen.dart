@@ -84,39 +84,12 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (secondsLeft == 0) {
         timer.cancel();
-        _showTimeUpDialog();
       } else {
         setState(() {
           secondsLeft--;
         });
       }
     });
-  }
-
-  void _showTimeUpDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("⏰ Time's up!"),
-        content: const Text('Your time is over.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text('Back to Menu'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _restartGame();
-            },
-            child: const Text('Try Again'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _onGameFinished() {
@@ -378,14 +351,13 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: widget.gameType),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),
-                (route) => false,
               );
             },
             style: ElevatedButton.styleFrom(
