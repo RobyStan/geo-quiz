@@ -47,8 +47,7 @@ Geo Quiz is an interactive Flutter app where users can guess countries, flags, o
 - GeoJSON map data provided by [geojson-maps.kyd.au](https://geojson-maps.kyd.au/?utm_source=self&utm_medium=redirect)
 
 
-
-## Image Credits / Photo Attributions
+## Image Credits 
 
 - **Home Screen background photo**  
   Photo by [NASA on Unsplash](https://unsplash.com/photos/photo-of-outer-space-Q1p7bh3SHj8)

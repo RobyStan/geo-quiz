@@ -120,7 +120,11 @@ class ChooseGameModeScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => const HomeScreen(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ),
                       (route) => false,
                     );
                   },
@@ -197,9 +201,13 @@ class ChooseGameModeScreen extends StatelessWidget {
         break;
     }
 
-    Navigator.push(
+   Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => screen),
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => screen,
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
     );
   }
 }

@@ -114,11 +114,13 @@ class ChooseRegionScreen extends StatelessWidget {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ChooseGameModeScreen(
+                                  PageRouteBuilder(
+                                    pageBuilder: (_, __, ___) => ChooseGameModeScreen(
                                       region: region,
                                       gameType: gameType,
                                     ),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
                                   ),
                                 );
                               },
@@ -151,7 +153,11 @@ class ChooseRegionScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => const HomeScreen(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ),
                       (route) => false,
                     );
                   },

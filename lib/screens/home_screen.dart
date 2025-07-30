@@ -2,20 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:geo_quiz_app/screens/choose_region_screen.dart';
 import 'package:geo_quiz_app/models/game_type.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(const AssetImage('assets/images/home_screen.jpg'), context);
+    precacheImage(const AssetImage('assets/images/choose_region.jpg'), context);
+    precacheImage(const AssetImage('assets/images/choose_game_mode.jpg'), context);
+    precacheImage(const AssetImage('assets/images/find_the_capital.jpg'), context);
+    precacheImage(const AssetImage('assets/images/find_the_country.jpg'), context);
+    precacheImage(const AssetImage('assets/images/guess_all_countries.jpg'), context);
+    precacheImage(const AssetImage('assets/images/guess_the_capital.jpg'), context);
+    precacheImage(const AssetImage('assets/images/guess_the_flag.jpg'), context);
+  }
+
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/home_screen.jpg',
-              fit: BoxFit.cover,
+           Positioned.fill(
+              child: Image.asset(
+                'assets/images/home_screen.jpg',
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 80),
@@ -91,14 +109,16 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChooseRegionScreen(gameType: gameType),
-              ),
-            );
-          },
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: gameType),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
+            },
           child: Text(label),
         ),
       ),

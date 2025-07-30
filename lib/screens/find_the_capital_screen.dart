@@ -235,7 +235,11 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
                             onPressed: () {
                               Navigator.pushAndRemoveUntil(
                                 context,
-                                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                PageRouteBuilder(
+                                  pageBuilder: (_, __, ___) => const HomeScreen(),
+                                  transitionDuration: Duration.zero,
+                                  reverseTransitionDuration: Duration.zero,
+                                ),
                                 (route) => false,
                               );
                             },
@@ -363,8 +367,10 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => ChooseRegionScreen(gameType: widget.gameType),
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: widget.gameType),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
                 ),
                 (route) => false,
               );
