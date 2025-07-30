@@ -356,7 +356,7 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
               onPressed: () {
                 setState(() {
                   message = 'Answer: ${currentCountry['capital']}';
-                  messageColor = Colors.green;
+                  messageColor = Colors.greenAccent;
                 });
               },
               icon: const Icon(Icons.visibility, color: Colors.greenAccent),

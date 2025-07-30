@@ -278,10 +278,10 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
                   right: 10,
                   child: ElevatedButton.icon(
                     onPressed: _showHint,
-                    icon: const Icon(Icons.visibility, color: Colors.greenAccent),
+                    icon: const Icon(Icons.visibility, color: Colors.green),
                     label: const Text(
                       'Hint',
-                      style: TextStyle(color: Colors.greenAccent),
+                      style: TextStyle(color: Colors.green),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white.withAlpha(175),

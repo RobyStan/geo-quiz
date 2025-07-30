@@ -225,11 +225,35 @@ class _WorldMapFindCountryState extends State<WorldMapFindCountry> with SingleTi
       }
     }
 
-    final centerLat = (minLat + maxLat) / 2;
-    final centerLng = (minLng + maxLng) / 2;
-
     final latDiff = maxLat - minLat;
-    final lngDiff = maxLng - minLng;
+    double centerLat = (minLat + maxLat) / 2;
+
+    double centerLng;
+    double lngDiff;
+
+    if (maxLng - minLng > 180) {
+      List<double> adjustedLngs = [];
+
+      for (final ring in polygon.rings) {
+        for (final point in ring) {
+          double lng = point.longitude;
+          if (lng < 0) lng += 360;
+          adjustedLngs.add(lng);
+        }
+      }
+
+      double minAdjLng = adjustedLngs.reduce((a, b) => a < b ? a : b);
+      double maxAdjLng = adjustedLngs.reduce((a, b) => a > b ? a : b);
+
+      lngDiff = maxAdjLng - minAdjLng;
+      double centerAdjLng = (minAdjLng + maxAdjLng) / 2;
+
+      centerLng = centerAdjLng > 180 ? centerAdjLng - 360 : centerAdjLng;
+    } else {
+      lngDiff = maxLng - minLng;
+      centerLng = (minLng + maxLng) / 2;
+    }
+
     double zoom = 5.0;
     if (latDiff > 20 || lngDiff > 20) {
       zoom = 3.0;
