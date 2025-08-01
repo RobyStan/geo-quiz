@@ -33,6 +33,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   late Map<String, String> currentTarget;
 
   bool gameOver = false;
+  bool isTimeUp = false;
   int _wrongAttempts = 0;
   Key _worldMapKey = UniqueKey();
 
@@ -54,6 +55,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
             .toList();
 
     gameOver = false;
+    isTimeUp = false;
     _wrongAttempts = 0;
     _correctCountryCodes.clear();
     _hintedCountryCode = null;
@@ -74,8 +76,12 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
     });
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (secondsLeft == 0) {
+      if (secondsLeft <= 0) {
         timer.cancel();
+        setState(() {
+          isTimeUp = true;
+          gameOver = true;
+        });
       } else {
         setState(() {
           secondsLeft--;
@@ -86,6 +92,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
 
   void _onGameFinished() {
     setState(() {
+      isTimeUp = false;
       gameOver = true;
       _timer?.cancel();
     });
@@ -98,6 +105,7 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   }
 
   void _restartGame() {
+    isTimeUp = false;
     _worldMapKey = UniqueKey();
     _initGame();
   }
@@ -301,12 +309,16 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
   }
 
   Widget _buildGameOverUI() {
+    final String title = isTimeUp
+        ? '⏰ Time\'s up!'
+        : '🎉 You guessed all capitals!';
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
-          'You guessed all capitals!',
-          style: TextStyle(
+        Text(
+          title,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -338,7 +350,8 @@ class _FindTheCapitalScreenState extends State<FindTheCapitalScreen> {
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: widget.gameType),
+                  pageBuilder: (_, __, ___) =>
+                      ChooseRegionScreen(gameType: widget.gameType),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),

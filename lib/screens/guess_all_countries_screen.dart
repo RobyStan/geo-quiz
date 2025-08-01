@@ -44,7 +44,7 @@ class _GuessAllCountriesScreenState extends State<GuessAllCountriesScreen> {
     if (!widget.isPractice) {
       secondsLeft = widget.timeLimitMinutes * 60;
       countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (secondsLeft == 0) {
+        if (secondsLeft <= 0) {
           timer.cancel();
           setState(() {
             gameOver = true;

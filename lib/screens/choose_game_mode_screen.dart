@@ -22,7 +22,7 @@ class ChooseGameModeScreen extends StatelessWidget {
       case 'World':
         return 25;
       case 'Oceania':
-        return 3;
+        return 1;
       default:
         return 15;
     }

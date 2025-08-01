@@ -140,7 +140,7 @@ class _GuessCapitalScreenState extends State<GuessCapitalScreen> {
     if (cleanedAnswer == correctCapital) {
       setState(() {
         message = 'Correct! 🎉';
-        messageColor = Colors.green;
+        messageColor = Colors.greenAccent;
         correctCount++;
       });
       Timer(const Duration(seconds: 1), () {

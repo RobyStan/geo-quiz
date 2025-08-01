@@ -31,6 +31,7 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
 
   late List<Map<String, String>> filteredCountries;
   bool gameOver = false;
+  bool isTimeUp = false;
   int _wrongAttempts = 0;
   Key _worldMapKey = UniqueKey();
   Map<String, String>? currentTarget;
@@ -82,8 +83,12 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
     });
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (secondsLeft == 0) {
+      if (secondsLeft <= 0) {
         timer.cancel();
+        setState(() {
+          gameOver = true;
+          isTimeUp = true;
+        });
       } else {
         setState(() {
           secondsLeft--;
@@ -94,6 +99,7 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
 
   void _onGameFinished() {
     setState(() {
+      isTimeUp = false;
       gameOver = true;
       _timer?.cancel();
     });
@@ -106,6 +112,7 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
   }
 
   void _restartGame() {
+     isTimeUp = false;
     _initGame();
   }
 
@@ -297,39 +304,26 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
   }
 
   Widget _buildGameOverUI() {
+    final String title = isTimeUp
+        ? '⏰ Time\'s up!'
+        : '🎉 You guessed all capitals!';
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
-          '🎉 You found all countries!',
-          style: TextStyle(
+        Text(
+          title,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            shadows: [
-              Shadow(
-                blurRadius: 4,
-                color: Colors.black,
-                offset: Offset(1, 1),
-              ),
-            ],
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
         Text(
           '❌ $_wrongAttempts mistakes',
-          style: const TextStyle(
-            fontSize: 18,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                blurRadius: 4,
-                color: Colors.black,
-                offset: Offset(1, 1),
-              ),
-            ],
-          ),
+          style: const TextStyle(fontSize: 18, color: Colors.redAccent),
         ),
         const SizedBox(height: 24),
         SizedBox(
@@ -339,9 +333,6 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white.withAlpha(175),
               foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
             ),
             child: const Text('Restart 🔁'),
           ),
@@ -354,7 +345,8 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
               Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => ChooseRegionScreen(gameType: widget.gameType),
+                  pageBuilder: (_, __, ___) =>
+                      ChooseRegionScreen(gameType: widget.gameType),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),
@@ -363,11 +355,8 @@ class _FindTheCountryScreenState extends State<FindTheCountryScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white.withAlpha(175),
               foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
             ),
-            child: const Text('Change Region 🌍'),
+            child: const Text('Change Region 🗺️'),
           ),
         ),
       ],

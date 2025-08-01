@@ -129,7 +129,7 @@ class _GuessFlagScreenState extends State<GuessFlagScreen> {
     if (cleanedAnswer == correct) {
       setState(() {
         message = 'Correct! 🎉';
-        messageColor = Colors.green;
+        messageColor = Colors.greenAccent;
         correctCount++;
       });
       Timer(const Duration(seconds: 1), () {

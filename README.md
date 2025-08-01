@@ -35,7 +35,7 @@ Geo Quiz is an interactive Flutter app where users can guess countries, flags, o
   - [x] Practice mode - no timer + hints
   - [x] Competitive mode — against a timer.
       
-- [ ] UI improvements, polish, and gameplay details to enhance the overall experience
+- [x] UI improvements, polish, and gameplay details to enhance the overall experience
     
 
 ## Language support
